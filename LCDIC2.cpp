@@ -23,7 +23,6 @@ void LCDIC2::begin() {
 
   clear();
   leftToRight();
-  home();
   display(true);
 }
 
