@@ -12,7 +12,7 @@
 #define LCDIC2_DDRAM        0b0010000000
 
 #define LCDIC2_RW           0b10
-#define LCDIC2_RS           0b1
+#define LCDIC2_RS           0b1000000000
 
 #define LCDIC2_BITS_4       0b0
 #define LCDIC2_BITS_8       0b10000
@@ -32,20 +32,22 @@
 #define LCDIC2_DEC          0b00
 #define LCDIC2_INC          0b10
 
-#define LCDIC2_LONG_DELAY   5000
-#define LCDIC2_SHORT_DELAY  150
+#define LCDIC2_BITS 4
+
+#define rs 0b00000001  // Register select bit
+
 
 class LCDIC2 {
   private:
-    bool _blink = false, _cursor = true, _display = true, _gain, _shift = false;
-    uint8_t _address, _height, _width, k;
+    bool _blink = true, _cursor = true, _display = true, _shift = false;
+    uint8_t _address, _height, _width;
+    String s;
 
   public:
     LCDIC2(uint8_t address, uint8_t width, uint8_t height);
     void backlight(bool state);
-    void begin();
     void blink(bool state);
-    uint8_t busy();
+    void busy();
     void clear();
     void cursor(bool state);
     void cursor(uint8_t x, uint8_t y);
@@ -55,14 +57,48 @@ class LCDIC2 {
     void rightToLeft();
     void moveLeft();
     void moveRight();
-    size_t print(const String str) {
+    size_t print(const String str, uint8_t mode=rs) {
       size_t n = 0;
-      while (n < str.length()) transmit(str[n++], LCDIC2_RS);
+      while (n < str.length()) transmit(str[n++], rs);
       return n;
     }
 
     void reset();
-    uint8_t transmit(uint8_t data, uint8_t mode = 0);
+
+    void begin() {
+      Wire.begin();
+      delay(50);
+
+      reset();
+
+      Wire.beginTransmission(_address);
+      Wire.write(0b11);
+      Wire.write(0b11);
+      Wire.write(0b11);
+      Wire.write(0b10);
+      Wire.endTransmission();
+
+      busy();
+
+      transmit(LCDIC2_FUNCTION | LCDIC2_BITS_4 | LCDIC2_LINES_2 | LCDIC2_DOTS_8);
+      transmit(LCDIC2_DISPLAY | _display << 2 | _cursor << 1 | _blink);
+
+      clear();
+      leftToRight();
+      display(true);
+    }
+
+    uint8_t transmit(uint8_t data, uint8_t mode = 0) {
+      Wire.beginTransmission(_address);
+      Wire.write(data & 0b11110000 | 0b100 | mode);
+      Wire.write(0b1000);
+      busy();
+      Wire.write((data & 0b00001111) << 4 | 0b100 | mode);
+      Wire.write(0b1000);
+      busy();
+      Wire.endTransmission();
+      delayMicroseconds(150);
+    }
 };
 
 #endif

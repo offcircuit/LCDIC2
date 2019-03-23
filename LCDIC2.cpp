@@ -6,26 +6,6 @@ LCDIC2::LCDIC2(uint8_t address, uint8_t width, uint8_t height) {
   _width = width;
 }
 
-void LCDIC2::begin() {
-  Wire.begin();
-  delay(50);
-
-  reset();
-
-  Wire.beginTransmission(_address);
-  Wire.write(0b11);
-  Wire.write(0b11);
-  Wire.write(0b11);
-  Wire.endTransmission();
-
-  transmit(LCDIC2_FUNCTION | LCDIC2_BITS_4 | LCDIC2_LINES_2 | LCDIC2_DOTS_8);
-  transmit(LCDIC2_DISPLAY | _display << 2 | _cursor << 1 | _blink);
-
-  clear();
-  leftToRight();
-  display(true);
-}
-
 void LCDIC2::backlight(bool state) {
   Wire.beginTransmission(_address);
   Wire.write(state << 3);
@@ -36,13 +16,13 @@ void LCDIC2::blink(bool state) {
   transmit(LCDIC2_DISPLAY | _display << 2 | _cursor << 1 | (_blink = state));
 }
 
-uint8_t LCDIC2::busy() {
+void LCDIC2::busy() {
   do Wire.requestFrom(uint8_t(_address), uint8_t(1));
   while (Wire.read() > 127);
 }
 
 void LCDIC2::clear() {
-  transmit(0b1);
+  transmit(0b1);delay(6);
 }
 
 void LCDIC2::cursor(bool state) {
@@ -70,11 +50,11 @@ void LCDIC2::moveRight() {
 }
 
 void LCDIC2::leftToRight() {
-  transmit(LCDIC2_MODE | (_gain = LCDIC2_INC >> 1) << 1 | (_shift = false));
+  transmit(LCDIC2_MODE | LCDIC2_INC | (_shift = false));
 }
 
 void LCDIC2::rightToLeft() {
-  transmit(LCDIC2_MODE | (_gain = LCDIC2_DEC >> 1) << 1 | (_shift = false));
+  transmit(LCDIC2_MODE | LCDIC2_DEC | (_shift = false));
 }
 
 void LCDIC2::reset() {
@@ -87,13 +67,40 @@ void LCDIC2::reset() {
   busy();
 }
 
+/*
 
-uint8_t LCDIC2::transmit(uint8_t data, uint8_t mode = 0) {
+  uint8_t LCDIC2::transmit(uint8_t data, uint8_t mode = 0) {
   Wire.beginTransmission(_address);
   do {
     Wire.write((data & 0b11110000 | 0b1100 | mode));
     Wire.write(0b11111011);
   } while (data = (data << 4));
   Wire.endTransmission();
-  delayMicroseconds(LCDIC2_SHORT_DELAY);
-}
+
+  delayMicroseconds(150);
+  }
+
+  void LCDIC2::begin() {
+  Wire.begin();
+  delay(50);
+
+  reset();
+
+  Wire.beginTransmission(_address);
+  Wire.write(0b11);
+  Wire.write(0b11);
+  Wire.write(0b11);
+  Wire.write(0b10);
+  Wire.endTransmission();
+
+  busy();
+
+  transmit(LCDIC2_FUNCTION | LCDIC2_BITS_4 | LCDIC2_LINES_2 | LCDIC2_DOTS_8);
+  transmit(LCDIC2_DISPLAY | _display << 2 | _cursor << 1 | _blink);
+
+  clear();
+  leftToRight();
+  display(true);
+  }
+
+*/
