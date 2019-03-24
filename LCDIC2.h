@@ -29,9 +29,13 @@
 #define LCDIC2_DEC          0b00
 #define LCDIC2_INC          0b10
 
+
+
+#define LCD_SETCGRAMADDR 0x40
+
 class LCDIC2 {
   private:
-    bool _blink = true, _cursor = true, _display = true, _shift = false;
+    bool _blink = false, _cursor = true, _display = true, _shift = false;
     uint8_t _address, _height, _width;
 
   public:
@@ -39,11 +43,12 @@ class LCDIC2 {
     void begin();
     void backlight(bool state);
     void blink(bool state);
-    void busy();
+    uint8_t busy();
     void clear();
     void cursor(bool state);
     void cursor(uint8_t x, uint8_t y);
     void display(bool state);
+    void glyph(uint8_t id, uint8_t map[]);
     void home();
     void leftToRight();
     void rightToLeft();
@@ -52,7 +57,8 @@ class LCDIC2 {
     size_t print(int32_t number);
     size_t print(String string);
     void reset();
-    uint8_t transmit(uint8_t data, bool mode = false);
+    uint8_t transmit(uint8_t data, uint8_t mode = 0);
+    void write(uint8_t character);
 };
 
 #endif
