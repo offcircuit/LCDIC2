@@ -59,15 +59,22 @@ void LCDIC2::cursor(uint8_t x, uint8_t y) {
   transmit(LCDIC2_DDRAM | min(y, _height - 1) << 6 | min(x, _width - 1));
 }
 
+void LCDIC2::cursorLeft() {
+    transmit(LCDIC2_MOVE | LCDIC2_CURSOR | LCDIC2_LEFT);
+}
+    
+void LCDIC2::cursorRight() {
+    transmit(LCDIC2_MOVE | LCDIC2_CURSOR | LCDIC2_RIGHT);
+}
+    
 void LCDIC2::display(bool state) {
   transmit(LCDIC2_DISPLAY | (_display = state) << 2 | _cursor << 1 | _blink);
 }
 
 void LCDIC2::glyph(uint8_t id, uint8_t map[]) {
-  transmit(0b1000000 | id << 3);
-  for (int i = 0; i < 8; i++) transmit(map[i], 1);
-  transmit(0b10000000);
-  display(true);
+  transmit(LCDIC2_CGRAM | id << 3);
+  for (uint8_t i = 0; i < 8; i++) transmit(map[i], 1);
+  transmit(LCDIC2_DDRAM);
 }
 
 void LCDIC2::home() {

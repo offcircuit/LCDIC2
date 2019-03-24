@@ -29,10 +29,6 @@
 #define LCDIC2_DEC          0b00
 #define LCDIC2_INC          0b10
 
-
-
-#define LCD_SETCGRAMADDR 0x40
-
 class LCDIC2 {
   private:
     bool _blink = false, _cursor = true, _display = true, _shift = false;
@@ -47,6 +43,8 @@ class LCDIC2 {
     void clear();
     void cursor(bool state);
     void cursor(uint8_t x, uint8_t y);
+    void cursorLeft();
+    void cursorRight();
     void display(bool state);
     void glyph(uint8_t id, uint8_t map[]);
     void home();
