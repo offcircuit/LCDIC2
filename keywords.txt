@@ -1,0 +1,35 @@
+#######################################
+# Syntax Coloring Map For LCDIC2
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+LiquidCrystal	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin	KEYWORD2
+backlight	KEYWORD2
+blink	KEYWORD2
+clear	KEYWORD2
+cursor	KEYWORD2
+cursorLeft	KEYWORD2
+cursorRight	KEYWORD2
+display	KEYWORD2
+glyph	KEYWORD2
+home	KEYWORD2
+leftToRight	KEYWORD2
+moveLeft	KEYWORD2
+moveright	KEYWORD2
+print	KEYWORD2
+rightToLeft	KEYWORD2
+shift	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+

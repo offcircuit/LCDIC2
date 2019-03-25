@@ -33,13 +33,15 @@ class LCDIC2 {
   private:
     bool _blink = false, _cursor = true, _display = true, _gain = LCDIC2_INC, _shift = false;
     uint8_t _address, _height, _width;
+    uint8_t busy();
+    void reset();
+    uint8_t transmit(uint8_t data, bool mode = false);
 
   public:
     LCDIC2(uint8_t address, uint8_t width, uint8_t height);
     void begin();
     void backlight(bool state);
     void blink(bool state);
-    uint8_t busy();
     void clear();
     void cursor(bool state);
     uint8_t cursor(uint8_t x, uint8_t y);
@@ -50,13 +52,11 @@ class LCDIC2 {
     void glyph(uint8_t id, uint8_t map[]);
     void home();
     void leftToRight();
-    void rightToLeft();
     void moveLeft();
     void moveRight();
     size_t print(String string);
-    void reset();
+    void rightToLeft();
     void shift(bool state);
-    uint8_t transmit(uint8_t data, bool mode = false);
 };
 
 #endif
