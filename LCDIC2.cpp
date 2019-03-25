@@ -88,11 +88,11 @@ void LCDIC2::home() {
 }
 
 void LCDIC2::leftToRight() {
-  transmit(LCDIC2_MODE | LCDIC2_INC | (_shift = false));
+  transmit(LCDIC2_MODE | (_gain = LCDIC2_INC >> 1) << 1 | _shift);
 }
 
 void LCDIC2::rightToLeft() {
-  transmit(LCDIC2_MODE | LCDIC2_DEC | (_shift = false));
+  transmit(LCDIC2_MODE | (_gain = LCDIC2_DEC >> 1) << 1 | _shift);
 }
 
 void LCDIC2::moveLeft() {
@@ -114,9 +114,13 @@ void LCDIC2::reset() {
   Wire.write(0b1);
   Wire.write(LCDIC2_FUNCTION | LCDIC2_BITS_8 | LCDIC2_LINES_1 | LCDIC2_DOTS_8);
   Wire.write(LCDIC2_DISPLAY);
-  Wire.write(LCDIC2_MODE | LCDIC2_INC);
+  Wire.write(LCDIC2_MODE | _gain << 1);
   Wire.endTransmission();
   busy();
+}
+
+void LCDIC2::shift(bool state) {
+  transmit(LCDIC2_MODE | _gain | _shift = state);
 }
 
 uint8_t LCDIC2::transmit(uint8_t data, bool mode = false) {

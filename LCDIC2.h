@@ -31,7 +31,7 @@
 
 class LCDIC2 {
   private:
-    bool _blink = false, _cursor = true, _display = true, _shift = false;
+    bool _blink = false, _cursor = true, _display = true, _gain = LCDIC2_INC, _shift = false;
     uint8_t _address, _height, _width;
 
   public:
@@ -55,6 +55,7 @@ class LCDIC2 {
     void moveRight();
     size_t print(String string);
     void reset();
+    void shift(bool state);
     uint8_t transmit(uint8_t data, bool mode = false);
 };
 
