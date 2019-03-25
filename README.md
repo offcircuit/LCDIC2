@@ -1,5 +1,5 @@
 # LCDIC2
-Class interface for LCD Display
+Class interface for Liquid Crystal
 
 # TESTED ON
 
