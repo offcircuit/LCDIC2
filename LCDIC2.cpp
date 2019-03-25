@@ -120,7 +120,7 @@ void LCDIC2::reset() {
 }
 
 void LCDIC2::shift(bool state) {
-  transmit(LCDIC2_MODE | _gain | _shift = state);
+  transmit(LCDIC2_MODE | _gain | (_shift = state));
 }
 
 uint8_t LCDIC2::transmit(uint8_t data, bool mode = false) {
