@@ -8,8 +8,6 @@ LCDIC2::LCDIC2(uint8_t address, uint8_t width, uint8_t height) {
 
 void LCDIC2::begin() {
   Wire.begin();
-  pulseIn(A4, LOW, 500000);
-
   reset();
 
   Wire.beginTransmission(_address);
@@ -29,7 +27,6 @@ void LCDIC2::begin() {
 
 void LCDIC2::backlight(bool state) {
   Wire.beginTransmission(_address);
-  Wire.write(0b0);
   Wire.write(state << 3);
   Wire.endTransmission();
   busy();
