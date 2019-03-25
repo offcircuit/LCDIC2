@@ -6,7 +6,7 @@
 # Datatypes (KEYWORD1)
 #######################################
 
-LiquidCrystal	KEYWORD1
+LCDIC2	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
