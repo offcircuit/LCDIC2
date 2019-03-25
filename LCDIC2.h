@@ -42,21 +42,20 @@ class LCDIC2 {
     uint8_t busy();
     void clear();
     void cursor(bool state);
-    void cursor(uint8_t x, uint8_t y);
+    uint8_t cursor(uint8_t x, uint8_t y);
     void cursorLeft();
     void cursorRight();
     void display(bool state);
+    void glyph(uint8_t character);
     void glyph(uint8_t id, uint8_t map[]);
     void home();
     void leftToRight();
     void rightToLeft();
     void moveLeft();
     void moveRight();
-    size_t print(int32_t number);
     size_t print(String string);
     void reset();
-    uint8_t transmit(uint8_t data, uint8_t mode = 0);
-    void write(uint8_t character);
+    uint8_t transmit(uint8_t data, bool mode = false);
 };
 
 #endif

@@ -29,6 +29,7 @@ void LCDIC2::begin() {
 
 void LCDIC2::backlight(bool state) {
   Wire.beginTransmission(_address);
+  Wire.write(0b0);
   Wire.write(state << 3);
   Wire.endTransmission();
   busy();
@@ -55,8 +56,8 @@ void LCDIC2::cursor(bool state) {
   transmit(LCDIC2_DISPLAY | _display << 2 | (_cursor = state) << 1 | _blink);
 }
 
-void LCDIC2::cursor(uint8_t x, uint8_t y) {
-  transmit(LCDIC2_DDRAM | min(y, _height - 1) << 6 | min(x, _width - 1));
+uint8_t LCDIC2::cursor(uint8_t x, uint8_t y) {
+  return transmit(LCDIC2_DDRAM | min(y, _height - 1) << 6 | min(x, _width - 1));
 }
 
 void LCDIC2::cursorLeft() {
@@ -71,11 +72,14 @@ void LCDIC2::display(bool state) {
   transmit(LCDIC2_DISPLAY | (_display = state) << 2 | _cursor << 1 | _blink);
 }
 
+void LCDIC2::glyph(uint8_t character) {
+  transmit(character, true);
+}
+
 void LCDIC2::glyph(uint8_t id, uint8_t map[]) {
   transmit(LCDIC2_CGRAM | id << 3);
-  for (uint8_t i = 0; i < 8; i++) transmit(map[i], 1);
+  for (uint8_t i = 0; i < 8; i++) transmit(map[i], true);
   transmit(LCDIC2_DDRAM);
-  //display(true);
 }
 
 void LCDIC2::home() {
@@ -99,10 +103,6 @@ void LCDIC2::moveRight() {
   transmit(LCDIC2_MOVE | LCDIC2_SHIFT | LCDIC2_RIGHT);
 }
 
-size_t LCDIC2::print(int32_t number) {
-  return print(String(number));
-}
-
 size_t LCDIC2::print(String string) {
   size_t i;
   for (i = 0; i < string.length(); i++) transmit(string[i], true);
@@ -119,16 +119,12 @@ void LCDIC2::reset() {
   busy();
 }
 
-uint8_t LCDIC2::transmit(uint8_t data, uint8_t mode = 0) {
+uint8_t LCDIC2::transmit(uint8_t data, bool mode = false) {
   Wire.beginTransmission(_address);
   Wire.write(data & 0b11110000 | 0b100 | mode);
   Wire.write(0b1000);
-  Wire.write((data & 0b00001111) << 4 | 0b100 | mode);
+  Wire.write((data << 4) & 0b11110000 | 0b100 | mode);
   Wire.write(0b1000);
   Wire.endTransmission();
   return busy();
-}
-
-void LCDIC2::write(uint8_t character) {
-  transmit(character, true);
 }
