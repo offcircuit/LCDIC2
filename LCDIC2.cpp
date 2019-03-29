@@ -77,7 +77,7 @@ void LCDIC2::glyph(uint8_t character) {
 void LCDIC2::glyph(uint8_t id, uint8_t map[]) { // TODO send cursor to latest position - need to extract ack
   transmit(LCDIC2_CGRAM | id << 3);
   for (uint8_t i = 0; i < 8; i++) transmit(map[i], true);
-  transmit(LCDIC2_DDRAM);k
+  transmit(LCDIC2_DDRAM);
 }
 
 void LCDIC2::home() {
