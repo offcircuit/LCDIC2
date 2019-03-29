@@ -1,4 +1,4 @@
-#include "LCDIC2.h"
+#include "LCDIC2.h" // needed a better datasheet
 
 LCDIC2::LCDIC2(uint8_t address, uint8_t width, uint8_t height) {
   _address = address;
@@ -36,7 +36,7 @@ void LCDIC2::blink(bool state) {
   transmit(LCDIC2_DISPLAY | _display << 2 | _cursor << 1 | (_blink = state));
 }
 
-uint8_t LCDIC2::busy() {
+uint8_t LCDIC2::busy() { // TODO cant extract ack
   uint8_t data = 0;
   do Wire.requestFrom(uint8_t(_address), uint8_t(1));
   while ((data = Wire.read()) > 127);
@@ -53,7 +53,7 @@ void LCDIC2::cursor(bool state) {
   transmit(LCDIC2_DISPLAY | _display << 2 | (_cursor = state) << 1 | _blink);
 }
 
-uint8_t LCDIC2::cursor(uint8_t x, uint8_t y) {
+uint8_t LCDIC2::cursor(uint8_t x, uint8_t y) { // TODO x/y conflict when x > 63; y change assembly
   return transmit(LCDIC2_DDRAM | min(y, _height - 1) << 6 | min(x, _width - 1));
 }
 
@@ -73,10 +73,10 @@ void LCDIC2::glyph(uint8_t character) {
   transmit(character, true);
 }
 
-void LCDIC2::glyph(uint8_t id, uint8_t map[]) {
+void LCDIC2::glyph(uint8_t id, uint8_t map[]) { // TODO send cursor to latest position - need to extract ack
   transmit(LCDIC2_CGRAM | id << 3);
   for (uint8_t i = 0; i < 8; i++) transmit(map[i], true);
-  transmit(LCDIC2_DDRAM);
+  transmit(LCDIC2_DDRAM);k
 }
 
 void LCDIC2::home() {
@@ -120,7 +120,7 @@ void LCDIC2::shift(bool state) {
   transmit(LCDIC2_MODE | _gain | (_shift = state));
 }
 
-uint8_t LCDIC2::transmit(uint8_t data, bool mode = false) {
+uint8_t LCDIC2::transmit(uint8_t data, bool mode = false) { // TODO works fine but ack is reseted
   Wire.beginTransmission(_address);
   Wire.write(data & 0b11110000 | 0b100 | mode);
   Wire.write(0b1000);
