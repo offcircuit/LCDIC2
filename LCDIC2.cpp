@@ -1,4 +1,5 @@
 #include "LCDIC2.h" // needed a better datasheet
+// try https://panda-bg.com/datasheet/2134-091834-LCD-module-TC1602D-02WA0-16x2-STN.pdf
 
 LCDIC2::LCDIC2(uint8_t address, uint8_t width, uint8_t height) {
   _address = address;
