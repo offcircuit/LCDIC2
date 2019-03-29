@@ -53,7 +53,7 @@ void LCDIC2::cursor(bool state) {
   transmit(LCDIC2_DISPLAY | _display << 2 | (_cursor = state) << 1 | _blink);
 }
 
-uint8_t LCDIC2::cursor(uint8_t x, uint8_t y) { // TODO x/y conflict when x > 63; y change assembly
+uint8_t LCDIC2::cursor(uint8_t x, uint8_t y) { // TODO x/y conflict; y change assembly
   return transmit(LCDIC2_DDRAM | min(y, _height - 1) << 6 | min(x, _width - 1));
 }
 
