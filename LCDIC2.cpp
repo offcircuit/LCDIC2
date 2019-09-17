@@ -118,7 +118,7 @@ void LCDIC2::rightToLeft() {
 }
 
 void LCDIC2::shift(bool state) {
-  transmit(LCDIC2_MODE | _gain | (_shift = state));
+  transmit(LCDIC2_MODE | _gain << 1 | (_shift = state));
 }
 
 uint8_t LCDIC2::transmit(uint8_t data, bool mode = false) { // TODO works fine but ack is reseted
