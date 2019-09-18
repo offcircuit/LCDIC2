@@ -18,8 +18,8 @@ void LCDIC2::begin() {
   Wire.write(0b10);
   Wire.endTransmission();
 
-  send(LCDIC2_FUNCTION | LCDIC2_BITS_4 | LCDIC2_LINES_2 | LCDIC2_DOTS_8);
-  send(LCDIC2_DISPLAY | _display << 2 | _cursor << 1 | _blink);
+  write(LCDIC2_FUNCTION | LCDIC2_BITS_4 | LCDIC2_LINES_2 | LCDIC2_DOTS_8);
+  write(LCDIC2_DISPLAY | _display << 2 | _cursor << 1 | _blink);
 
   clear();
   leftToRight();
@@ -34,7 +34,7 @@ void LCDIC2::backlight(bool state) {
 }
 
 void LCDIC2::blink(bool state) {
-  send(LCDIC2_DISPLAY | _display << 2 | _cursor << 1 | (_blink = state));
+  write(LCDIC2_DISPLAY | _display << 2 | _cursor << 1 | (_blink = state));
 }
 
 uint8_t LCDIC2::busy() { // TODO cant extract ack
@@ -46,60 +46,60 @@ uint8_t LCDIC2::busy() { // TODO cant extract ack
 }
 
 void LCDIC2::clear() {
-  send(0b1);
+  write(0b1);
   pulseIn(SDA, LOW, 2500);
 }
 
 void LCDIC2::cursor(bool state) {
-  send(LCDIC2_DISPLAY | _display << 2 | (_cursor = state) << 1 | _blink);
+  write(LCDIC2_DISPLAY | _display << 2 | (_cursor = state) << 1 | _blink);
 }
 
 uint8_t LCDIC2::cursor(uint8_t x, uint8_t y) { // TODO x/y conflict; y change assembly
-  return send(LCDIC2_DDRAM | min(y, _height - 1) << 6 | min(x, _width - 1));
+  return write(LCDIC2_DDRAM | min(y, _height - 1) << 6 | min(x, _width - 1));
 }
 
 void LCDIC2::cursorLeft() {
-  send(LCDIC2_MOVE | LCDIC2_CURSOR | LCDIC2_LEFT);
+  write(LCDIC2_MOVE | LCDIC2_CURSOR | LCDIC2_LEFT);
 }
 
 void LCDIC2::cursorRight() {
-  send(LCDIC2_MOVE | LCDIC2_CURSOR | LCDIC2_RIGHT);
+  write(LCDIC2_MOVE | LCDIC2_CURSOR | LCDIC2_RIGHT);
 }
 
 void LCDIC2::display(bool state) {
-  send(LCDIC2_DISPLAY | (_display = state) << 2 | _cursor << 1 | _blink);
+  write(LCDIC2_DISPLAY | (_display = state) << 2 | _cursor << 1 | _blink);
 }
 
 void LCDIC2::glyph(uint8_t character) {
-  send(character, true);
+  write(character, true);
 }
 
 void LCDIC2::glyph(uint8_t id, uint8_t map[]) {
-  send(LCDIC2_CGRAM | id << 3);
-  for (uint8_t i = 0; i < 8; i++) send(map[i], true);
-  send(LCDIC2_DDRAM);
+  write(LCDIC2_CGRAM | id << 3);
+  for (uint8_t i = 0; i < 8; i++) write(map[i], true);
+  write(LCDIC2_DDRAM);
 }
 
 void LCDIC2::home() {
-  send(0b10);
+  write(0b10);
   pulseIn(SDA, LOW, 2500);
 }
 
 void LCDIC2::leftToRight() {
-  send(LCDIC2_MODE | (_gain = LCDIC2_INC >> 1) << 1 | _shift);
+  write(LCDIC2_MODE | (_gain = LCDIC2_INC >> 1) << 1 | _shift);
 }
 
 void LCDIC2::moveLeft() {
-  send(LCDIC2_MOVE | LCDIC2_SHIFT | LCDIC2_LEFT);
+  write(LCDIC2_MOVE | LCDIC2_SHIFT | LCDIC2_LEFT);
 }
 
 void LCDIC2::moveRight() {
-  send(LCDIC2_MOVE | LCDIC2_SHIFT | LCDIC2_RIGHT);
+  write(LCDIC2_MOVE | LCDIC2_SHIFT | LCDIC2_RIGHT);
 }
 
 size_t LCDIC2::print(String string) {
   size_t i;
-  for (i = 0; i < string.length(); i++) send(string[i], true);
+  for (i = 0; i < string.length(); i++) write(string[i], true);
   return i;
 }
 
@@ -114,14 +114,14 @@ void LCDIC2::reset() {
 }
 
 void LCDIC2::rightToLeft() {
-  send(LCDIC2_MODE | (_gain = LCDIC2_DEC >> 1) << 1 | _shift);
+  write(LCDIC2_MODE | (_gain = LCDIC2_DEC >> 1) << 1 | _shift);
 }
 
 void LCDIC2::shift(bool state) {
-  send(LCDIC2_MODE | _gain << 1 | (_shift = state));
+  write(LCDIC2_MODE | _gain << 1 | (_shift = state));
 }
 
-uint8_t LCDIC2::send(uint8_t data, bool mode = false) {
+uint8_t LCDIC2::write(uint8_t data, bool mode = false) {
   Wire.beginTransmission(_address);
   Wire.write(data & 0b11110000 | 0b100 | mode);
   Wire.write(0b1000);
