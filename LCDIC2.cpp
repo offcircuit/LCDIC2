@@ -9,11 +9,15 @@ LCDIC2::LCDIC2(uint8_t address, uint8_t width, uint8_t height) {
 
 void LCDIC2::begin() {
   Wire.begin(_address);
+
   reset();
 
   Wire.beginTransmission(_address);
+  _delay_ms(50);
   Wire.write(0b11);
+  _delay_ms(5);
   Wire.write(0b11);
+  _delay_us(100);
   Wire.write(0b11);
   Wire.write(0b10);
   Wire.endTransmission();
@@ -39,15 +43,15 @@ void LCDIC2::blink(bool state) {
 
 void LCDIC2::clear() {
   write(0b1);
-  pulseIn(SDA, LOW, 2500);
+  _delay_ms(3);
 }
 
 void LCDIC2::cursor(bool state) {
   write(LCDIC2_DISPLAY | _display << 2 | (_cursor = state) << 1 | _blink);
 }
 
-uint8_t LCDIC2::cursor(uint8_t x, uint8_t y) { 
-  return write(LCDIC2_DDRAM | min(y, _height - 1) << 6 | min(x, _width - 1));
+uint8_t LCDIC2::cursor(uint8_t x, uint8_t y) {
+  return write(LCDIC2_DDRAM | (y < _height - 1 ? y : _height - 1) << 6 | (x < _width - 1 ? x : _width - 1));
 }
 
 void LCDIC2::cursorLeft() {
@@ -62,11 +66,11 @@ void LCDIC2::display(bool state) {
   write(LCDIC2_DISPLAY | (_display = state) << 2 | _cursor << 1 | _blink);
 }
 
-uint8_t LCDIC2::flag() { 
+uint8_t LCDIC2::flag() {
   uint8_t data = 0;
   do Wire.requestFrom(uint8_t(_address), uint8_t(1));
   while ((data = Wire.read()) > 127);
-  pulseIn(SDA, LOW, 500);
+  _delay_ms(1);
   return data;
 }
 
@@ -82,7 +86,7 @@ void LCDIC2::glyph(uint8_t id, uint8_t map[]) {
 
 void LCDIC2::home() {
   write(0b10);
-  pulseIn(SDA, LOW, 2500);
+  _delay_ms(3);
 }
 
 void LCDIC2::leftToRight() {
