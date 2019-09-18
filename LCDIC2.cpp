@@ -13,11 +13,8 @@ void LCDIC2::begin() {
   reset();
 
   Wire.beginTransmission(_address);
-  _delay_ms(50);
   Wire.write(0b11);
-  _delay_ms(5);
   Wire.write(0b11);
-  _delay_us(100);
   Wire.write(0b11);
   Wire.write(0b10);
   Wire.endTransmission();
@@ -43,7 +40,7 @@ void LCDIC2::blink(bool state) {
 
 void LCDIC2::clear() {
   write(0b1);
-  _delay_ms(3);
+  flag();
 }
 
 void LCDIC2::cursor(bool state) {
@@ -64,13 +61,13 @@ void LCDIC2::cursorRight() {
 
 void LCDIC2::display(bool state) {
   write(LCDIC2_DISPLAY | (_display = state) << 2 | _cursor << 1 | _blink);
+  flag();
 }
 
 uint8_t LCDIC2::flag() {
   uint8_t data = 0;
   do Wire.requestFrom(uint8_t(_address), uint8_t(1));
   while ((data = Wire.read()) > 127);
-  _delay_ms(1);
   return data;
 }
 
@@ -86,7 +83,7 @@ void LCDIC2::glyph(uint8_t id, uint8_t map[]) {
 
 void LCDIC2::home() {
   write(0b10);
-  _delay_ms(3);
+  flag();
 }
 
 void LCDIC2::leftToRight() {
