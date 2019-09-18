@@ -26,8 +26,8 @@
 #define LCDIC2_LEFT         0b000
 #define LCDIC2_RIGHT        0b100
 
-#define LCDIC2_DEC          0b00
-#define LCDIC2_INC          0b10
+#define LCDIC2_DEC          0b0
+#define LCDIC2_INC          0b1
 
 class LCDIC2 {
   private:
