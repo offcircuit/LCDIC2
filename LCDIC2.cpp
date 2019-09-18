@@ -47,7 +47,7 @@ void LCDIC2::cursor(bool state) {
   write(LCDIC2_DISPLAY | _display << 2 | (_cursor = state) << 1 | _blink);
 }
 
-uint8_t LCDIC2::cursor(uint8_t x, uint8_t y) {
+uint8_t LCDIC2::cursor(uint8_t y, uint8_t x) {
   return write(LCDIC2_DDRAM | (y < _height - 1 ? y : _height - 1) << 6 | (x < _width - 1 ? x : _width - 1));
 }
 
