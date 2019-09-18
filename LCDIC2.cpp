@@ -41,13 +41,13 @@ uint8_t LCDIC2::busy() { // TODO cant extract ack
   uint8_t data = 0;
   do Wire.requestFrom(uint8_t(_address), uint8_t(1));
   while ((data = Wire.read()) > 127);
-  pulseIn(A4, LOW, 500);
+  pulseIn(SDA, LOW, 500);
   return data;
 }
 
 void LCDIC2::clear() {
   transmit(0b1);
-  pulseIn(A4, LOW, 2500);
+  pulseIn(SDA, LOW, 2500);
 }
 
 void LCDIC2::cursor(bool state) {
@@ -82,7 +82,7 @@ void LCDIC2::glyph(uint8_t id, uint8_t map[]) {
 
 void LCDIC2::home() {
   transmit(0b10);
-  pulseIn(A4, LOW, 2500);
+  pulseIn(SDA, LOW, 2500);
 }
 
 void LCDIC2::leftToRight() {
