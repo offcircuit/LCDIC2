@@ -1,7 +1,7 @@
 #ifndef LCDIC2_H
 #define LCDIC2_H
 
-#include "Arduino.h"
+#include <util/delay.h>
 #include "Wire.h"
 
 #define LCDIC2_MODE         0b100
