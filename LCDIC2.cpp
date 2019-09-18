@@ -8,7 +8,7 @@ LCDIC2::LCDIC2(uint8_t address, uint8_t width, uint8_t height) {
 }
 
 void LCDIC2::begin() {
-  Wire.begin();
+  Wire.begin(_address);
   reset();
 
   Wire.beginTransmission(_address);
@@ -74,7 +74,7 @@ void LCDIC2::glyph(uint8_t character) {
   transmit(character, true);
 }
 
-void LCDIC2::glyph(uint8_t id, uint8_t map[]) { // TODO send cursor to latest position - need to extract ack
+void LCDIC2::glyph(uint8_t id, uint8_t map[]) {
   transmit(LCDIC2_CGRAM | id << 3);
   for (uint8_t i = 0; i < 8; i++) transmit(map[i], true);
   transmit(LCDIC2_DDRAM);
@@ -121,11 +121,11 @@ void LCDIC2::shift(bool state) {
   transmit(LCDIC2_MODE | _gain << 1 | (_shift = state));
 }
 
-uint8_t LCDIC2::transmit(uint8_t data, bool mode = false) { // TODO works fine but ack is reseted
+uint8_t LCDIC2::transmit(uint8_t data, bool mode = false) {
   Wire.beginTransmission(_address);
   Wire.write(data & 0b11110000 | 0b100 | mode);
   Wire.write(0b1000);
-  Wire.write((data << 4) & 0b11110000 | 0b100 | mode);
+  Wire.write(data << 4 | 0b0100 | mode);
   Wire.write(0b1000);
   Wire.endTransmission();
   return busy();
