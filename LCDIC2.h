@@ -33,7 +33,7 @@ class LCDIC2 {
   private:
     bool _blink = true, _cursor = true, _display = true, _gain = LCDIC2_INC, _shift = false;
     uint8_t _address, _height, _width;
-    uint8_t busy();
+    uint8_t flag();
     void reset();
     uint8_t write(uint8_t data, bool mode = false);
 
