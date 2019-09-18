@@ -31,11 +31,11 @@
 
 class LCDIC2 {
   private:
-    bool _blink = false, _cursor = true, _display = true, _gain = LCDIC2_INC, _shift = false;
+    bool _blink = true, _cursor = true, _display = true, _gain = LCDIC2_INC, _shift = false;
     uint8_t _address, _height, _width;
     uint8_t busy();
     void reset();
-    uint8_t transmit(uint8_t data, bool mode = false);
+    uint8_t write(uint8_t data, bool mode = false);
 
   public:
     LCDIC2(uint8_t address, uint8_t width, uint8_t height);
