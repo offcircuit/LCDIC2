@@ -37,7 +37,7 @@ void LCDIC2::blink(bool state) {
   write(LCDIC2_DISPLAY | _display << 2 | _cursor << 1 | (_blink = state));
 }
 
-uint8_t LCDIC2::busy() { // TODO cant extract ack
+uint8_t LCDIC2::busy() {
   uint8_t data = 0;
   do Wire.requestFrom(uint8_t(_address), uint8_t(1));
   while ((data = Wire.read()) > 127);
@@ -54,7 +54,7 @@ void LCDIC2::cursor(bool state) {
   write(LCDIC2_DISPLAY | _display << 2 | (_cursor = state) << 1 | _blink);
 }
 
-uint8_t LCDIC2::cursor(uint8_t x, uint8_t y) { // TODO x/y conflict; y change assembly
+uint8_t LCDIC2::cursor(uint8_t x, uint8_t y) { 
   return write(LCDIC2_DDRAM | min(y, _height - 1) << 6 | min(x, _width - 1));
 }
 
