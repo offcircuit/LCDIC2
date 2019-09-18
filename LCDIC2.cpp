@@ -30,19 +30,11 @@ void LCDIC2::backlight(bool state) {
   Wire.beginTransmission(_address);
   Wire.write(state << 3);
   Wire.endTransmission();
-  busy();
+  flag();
 }
 
 void LCDIC2::blink(bool state) {
   write(LCDIC2_DISPLAY | _display << 2 | _cursor << 1 | (_blink = state));
-}
-
-uint8_t LCDIC2::busy() {
-  uint8_t data = 0;
-  do Wire.requestFrom(uint8_t(_address), uint8_t(1));
-  while ((data = Wire.read()) > 127);
-  pulseIn(SDA, LOW, 500);
-  return data;
 }
 
 void LCDIC2::clear() {
@@ -68,6 +60,14 @@ void LCDIC2::cursorRight() {
 
 void LCDIC2::display(bool state) {
   write(LCDIC2_DISPLAY | (_display = state) << 2 | _cursor << 1 | _blink);
+}
+
+uint8_t LCDIC2::flag() { 
+  uint8_t data = 0;
+  do Wire.requestFrom(uint8_t(_address), uint8_t(1));
+  while ((data = Wire.read()) > 127);
+  pulseIn(SDA, LOW, 500);
+  return data;
 }
 
 void LCDIC2::glyph(uint8_t character) {
@@ -103,6 +103,10 @@ size_t LCDIC2::print(String string) {
   return i;
 }
 
+void LCDIC2::shift(bool state) {
+  write(LCDIC2_MODE | _gain << 1 | (_shift = state));
+}
+
 void LCDIC2::reset() {
   Wire.beginTransmission(_address);
   Wire.write(0b1);
@@ -110,15 +114,11 @@ void LCDIC2::reset() {
   Wire.write(LCDIC2_DISPLAY);
   Wire.write(LCDIC2_MODE | _gain << 1);
   Wire.endTransmission();
-  busy();
+  flag();
 }
 
 void LCDIC2::rightToLeft() {
   write(LCDIC2_MODE | (_gain = LCDIC2_DEC >> 1) << 1 | _shift);
-}
-
-void LCDIC2::shift(bool state) {
-  write(LCDIC2_MODE | _gain << 1 | (_shift = state));
 }
 
 uint8_t LCDIC2::write(uint8_t data, bool mode = false) {
@@ -128,5 +128,5 @@ uint8_t LCDIC2::write(uint8_t data, bool mode = false) {
   Wire.write(data << 4 | 0b0100 | mode);
   Wire.write(0b1000);
   Wire.endTransmission();
-  return busy();
+  return flag();
 }
