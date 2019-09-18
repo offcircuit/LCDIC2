@@ -86,7 +86,7 @@ void LCDIC2::home() {
 }
 
 void LCDIC2::leftToRight() {
-  write(LCDIC2_MODE | (_gain = LCDIC2_INC >> 1) << 1 | _shift);
+  write(LCDIC2_MODE | (_gain = LCDIC2_INC) << 1 | _shift);
 }
 
 void LCDIC2::moveLeft() {
@@ -118,7 +118,7 @@ void LCDIC2::reset() {
 }
 
 void LCDIC2::rightToLeft() {
-  write(LCDIC2_MODE | (_gain = LCDIC2_DEC >> 1) << 1 | _shift);
+  write(LCDIC2_MODE | (_gain = LCDIC2_DEC) << 1 | _shift);
 }
 
 uint8_t LCDIC2::write(uint8_t data, bool mode = false) {
