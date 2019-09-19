@@ -10,7 +10,7 @@ bool LCDIC2::begin() {
   delay(500);
   Wire.begin(_address);
 
-   if (reset()) {
+  if (reset()) {
     delayMicroseconds(2000);
     backlight(true);
     home();
@@ -56,12 +56,14 @@ bool LCDIC2::display(bool state) {
 }
 
 bool LCDIC2::flag() {
-  Wire.beginTransmission(_address);
-  Wire.write(0b110);
-  Wire.endTransmission();
-  do Wire.requestFrom(uint8_t(_address), uint8_t(2));
-  while (Wire.available() < 2);
-  while ((Wire.read() << 4 | (Wire.read() && 0b00001111)) > 127);
+  do {
+    Wire.beginTransmission(_address);
+    Wire.write(0b110);
+    Wire.endTransmission(1);
+    Wire.requestFrom(uint8_t(_address), uint8_t(2));
+    while (Wire.available() < 2);
+  }  while ((Wire.read() << 4 | (Wire.read() && 0b00001111)) > 127);
+
   return true;
 }
 
