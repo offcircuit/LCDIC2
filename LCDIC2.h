@@ -40,23 +40,23 @@ class LCDIC2 {
   public:
     LCDIC2(uint8_t address, uint8_t width, uint8_t height);
     bool begin();
-    void backlight(bool state);
-    void blink(bool state);
-    void clear();
-    void cursor(bool state);
-    uint8_t cursor(uint8_t x, uint8_t y);
-    void cursorLeft();
-    void cursorRight();
-    void display(bool state);
-    void glyph(uint8_t character);
-    void glyph(uint8_t id, uint8_t map[], uint8_t height = 8);
-    void home();
-    void leftToRight();
-    void moveLeft();
-    void moveRight();
-    size_t print(String string);
-    void rightToLeft();
-    void shift(bool state);
+    bool backlight(bool state);
+    bool blink(bool state);
+    bool clear();
+    bool cursor(bool state);
+    bool cursor(uint8_t x, uint8_t y);
+    bool cursorLeft();
+    bool cursorRight();
+    bool display(bool state);
+    bool glyph(uint8_t character);
+    bool glyph(uint8_t id, uint8_t map[]);
+    bool home();
+    bool leftToRight();
+    bool moveLeft();
+    bool moveRight();
+    size_t print(String data);
+    bool rightToLeft();
+    bool shift(bool state);
 
 
     bool send(uint8_t reg, uint8_t data) {
