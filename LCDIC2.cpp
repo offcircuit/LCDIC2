@@ -1,5 +1,4 @@
-#include "LCDIC2.h" // needed a better datasheet
-// try https://panda-bg.com/datasheet/2134-091834-LCD-module-TC1602D-02WA0-16x2-STN.pdf
+#include "LCDIC2.h" 
 
 LCDIC2::LCDIC2(uint8_t address, uint8_t width, uint8_t height) {
   _address = address;
@@ -7,15 +6,18 @@ LCDIC2::LCDIC2(uint8_t address, uint8_t width, uint8_t height) {
   _width = width;
 }
 
-uint8_t LCDIC2::begin() {
+bool LCDIC2::begin() {
   delay(500);
   Wire.begin(_address);
   if (reset()) {
     delayMicroseconds(2000);
+    
     backlight(true);
     home();
+    clear();
+    return true;
   }
-  return 1;
+  return false;
 }
 
 void LCDIC2::backlight(bool state) {
@@ -55,16 +57,17 @@ void LCDIC2::display(bool state) {
   flag();
 }
 
-uint8_t LCDIC2::flag() {
+bool LCDIC2::flag() {
   uint8_t data = 0;
-  do
-    Wire.requestFrom(uint8_t(_address), uint8_t(1));
-  while ((data = Wire.read()) > 127);
-
-  //Wire.read(); Wire.read();
-  //Wire.requestFrom(uint8_t(_address), uint8_t(1));
-  //while (Wire.available()) Wire.read();
-  return data;
+  Wire.beginTransmission(_address);
+  Wire.write(0b110);
+  Wire.endTransmission(1);
+  do Wire.requestFrom(uint8_t(_address), uint8_t(2));
+  while (!Wire.available());
+  data = Wire.read();
+  Wire.read();
+  while (data > 127);
+  return true;
 }
 
 void LCDIC2::glyph(uint8_t character) {
@@ -104,38 +107,29 @@ void LCDIC2::shift(bool state) {
   write(LCDIC2_MODE | _gain << 1 | (_shift = state));
 }
 
-uint8_t LCDIC2::reset() {
+bool LCDIC2::reset() {
   Wire.beginTransmission(_address);
   Wire.write(0b11);
-  delayMicroseconds(4500);
+  delayMicroseconds(4100);
   Wire.write(0b11);
-  delayMicroseconds(4500);
+  delayMicroseconds(100);
   Wire.write(0b11);
-  delayMicroseconds(150);
+  delayMicroseconds(100);
   Wire.write(0b10);
   Wire.endTransmission(1);
-  delayMicroseconds(53);
-
+  delayMicroseconds(100);
   send(0b0, LCDIC2_FUNCTION | LCDIC2_BITS_4 | LCDIC2_LINES_2 | LCDIC2_DOTS_8);
-  delayMicroseconds(53);
-
   send(0b10, 0b1000);
-  delayMicroseconds(3000);
-
   send(0b0, 0b1);
-  delayMicroseconds(3000);
-
   send(0b0, _display << 2 | _cursor << 1 | _blink);
-  delayMicroseconds(60);
-  return 1;
+  return true;
 }
 
 void LCDIC2::rightToLeft() {
   write(LCDIC2_MODE | (_gain = LCDIC2_DEC) << 1 | _shift);
 }
 
-uint8_t LCDIC2::write(uint8_t data, bool mode) {
-  Serial.println();
+bool LCDIC2::write(uint8_t data, bool mode) {
   Wire.beginTransmission(_address);
   Wire.write(data & 0b11110000 | 0b100 | mode);
   Wire.write(0b1000);
