@@ -33,13 +33,13 @@ class LCDIC2 {
   private:
     bool _blink = false, _cursor = true, _display = true, _gain = LCDIC2_INC, _shift = false;
     uint8_t _address, _height, _width;
-    uint8_t flag();
-    uint8_t reset();
-    uint8_t write(uint8_t data, bool mode = false);
+    bool flag();
+    bool reset();
+    bool write(uint8_t data, bool mode = false);
 
   public:
     LCDIC2(uint8_t address, uint8_t width, uint8_t height);
-    uint8_t begin();
+    bool begin();
     void backlight(bool state);
     void blink(bool state);
     void clear();
@@ -58,11 +58,12 @@ class LCDIC2 {
     void rightToLeft();
     void shift(bool state);
 
-    uint8_t send(uint8_t reg, uint8_t data) {
+
+    bool send(uint8_t reg, uint8_t data) {
       Wire.beginTransmission(_address);
       Wire.write(reg);
       Wire.write(data);
-      return Wire.endTransmission(1);
+      return (Wire.endTransmission(1) == 0) && flag();
     }
 };
 
