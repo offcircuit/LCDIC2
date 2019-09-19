@@ -1,5 +1,12 @@
 #include "LCDIC2.h"
 
+/*
+  incompatibility with wire library
+  transmission always sends a nack
+  it must be because it is 4bit mode.
+  is working quite well
+*/
+
 LCDIC2::LCDIC2(uint8_t address, uint8_t width, uint8_t height) {
   _address = address;
   _height = height;
