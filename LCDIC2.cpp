@@ -107,14 +107,13 @@ size_t LCDIC2::print(String data) {
 
 bool LCDIC2::reset() {
   Wire.beginTransmission(_address);
-  Wire.write(uint8_t(0b0));
-  Wire.write(uint8_t(0b11));
+  Wire.write(0b11);
   delayMicroseconds(4100);
-  Wire.write(uint8_t(0b11));
+  Wire.write(0b11);
   delayMicroseconds(100);
-  Wire.write(uint8_t(0b11));
+  Wire.write(0b11);
   delayMicroseconds(100);
-  Wire.write(uint8_t(0b10));
+  Wire.write(0b10);
   Wire.endTransmission();
   delayMicroseconds(100);
   send(0b0, LCDIC2_FUNCTION | LCDIC2_BITS_4 | LCDIC2_LINES_2 | LCDIC2_DOTS_8);
