@@ -1,4 +1,4 @@
-#include "LCDIC2.h" 
+#include "LCDIC2.h"
 
 LCDIC2::LCDIC2(uint8_t address, uint8_t width, uint8_t height) {
   _address = address;
@@ -11,7 +11,7 @@ bool LCDIC2::begin() {
   Wire.begin(_address);
   if (reset()) {
     delayMicroseconds(2000);
-    
+
     backlight(true);
     home();
     clear();
@@ -20,41 +20,39 @@ bool LCDIC2::begin() {
   return false;
 }
 
-void LCDIC2::backlight(bool state) {
+bool LCDIC2::backlight(bool state) {
   Wire.beginTransmission(_address);
   Wire.write(state << 3);
   Wire.endTransmission();
-  flag();
+  return flag();
 }
 
-void LCDIC2::blink(bool state) {
-  write(LCDIC2_DISPLAY | _display << 2 | _cursor << 1 | (_blink = state));
+bool LCDIC2::blink(bool state) {
+  return write(LCDIC2_DISPLAY | _display << 2 | _cursor << 1 | (_blink = state));
 }
 
-void LCDIC2::clear() {
-  write(0b1);
-  delayMicroseconds(3000);
+bool LCDIC2::clear() {
+  return write(0b1);
 }
 
-void LCDIC2::cursor(bool state) {
-  write(LCDIC2_DISPLAY | _display << 2 | (_cursor = state) << 1 | _blink);
+bool LCDIC2::cursor(bool state) {
+  return write(LCDIC2_DISPLAY | _display << 2 | (_cursor = state) << 1 | _blink);
 }
 
-uint8_t LCDIC2::cursor(uint8_t y, uint8_t x) {
+bool LCDIC2::cursor(uint8_t y, uint8_t x) {
   return write(LCDIC2_DDRAM | (y < _height - 1 ? y : _height - 1) << 6 | (x < _width - 1 ? x : _width - 1));
 }
 
-void LCDIC2::cursorLeft() {
-  write(LCDIC2_MOVE | LCDIC2_CURSOR | LCDIC2_LEFT);
+bool LCDIC2::cursorLeft() {
+  return write(LCDIC2_MOVE | LCDIC2_CURSOR | LCDIC2_LEFT);
 }
 
-void LCDIC2::cursorRight() {
-  write(LCDIC2_MOVE | LCDIC2_CURSOR | LCDIC2_RIGHT);
+bool LCDIC2::cursorRight() {
+  return write(LCDIC2_MOVE | LCDIC2_CURSOR | LCDIC2_RIGHT);
 }
 
-void LCDIC2::display(bool state) {
-  write(LCDIC2_DISPLAY | (_display = state) << 2 | _cursor << 1 | _blink);
-  flag();
+bool LCDIC2::display(bool state) {
+  return write(LCDIC2_DISPLAY | (_display = state) << 2 | _cursor << 1 | _blink);
 }
 
 bool LCDIC2::flag() {
@@ -70,41 +68,40 @@ bool LCDIC2::flag() {
   return true;
 }
 
-void LCDIC2::glyph(uint8_t character) {
-  write(character, true);
+bool LCDIC2::glyph(uint8_t character) {
+  return write(character, true);
 }
 
-void LCDIC2::glyph(uint8_t id, uint8_t map[], uint8_t height) {
+bool LCDIC2::glyph(uint8_t id, uint8_t map[]) {
   write(LCDIC2_CGRAM | id << 3);
   for (uint8_t i = 0; i < 8; i++) write(map[i], true);
   write(LCDIC2_DDRAM);
 }
 
-void LCDIC2::home() {
-  write(0b10);
-  delayMicroseconds(2000);
+bool LCDIC2::home() {
+  return write(0b10);
 }
 
-void LCDIC2::leftToRight() {
-  write(LCDIC2_MODE | (_gain = LCDIC2_INC) << 1 | _shift);
+bool LCDIC2::leftToRight() {
+  return write(LCDIC2_MODE | (_gain = LCDIC2_INC) << 1 | _shift);
 }
 
-void LCDIC2::moveLeft() {
-  write(LCDIC2_MOVE | LCDIC2_SHIFT | LCDIC2_LEFT);
+bool LCDIC2::moveLeft() {
+  return write(LCDIC2_MOVE | LCDIC2_SHIFT | LCDIC2_LEFT);
 }
 
-void LCDIC2::moveRight() {
-  write(LCDIC2_MOVE | LCDIC2_SHIFT | LCDIC2_RIGHT);
+bool LCDIC2::moveRight() {
+  return write(LCDIC2_MOVE | LCDIC2_SHIFT | LCDIC2_RIGHT);
 }
 
-size_t LCDIC2::print(String string) {
-  size_t i;
-  for (i = 0; i < string.length(); i++) write(string[i], true);
+size_t LCDIC2::print(String data) {
+  size_t i = 0;
+  while (write(data[i], true) && (++i < data.length()));
   return i;
 }
 
-void LCDIC2::shift(bool state) {
-  write(LCDIC2_MODE | _gain << 1 | (_shift = state));
+bool LCDIC2::shift(bool state) {
+  return write(LCDIC2_MODE | _gain << 1 | (_shift = state));
 }
 
 bool LCDIC2::reset() {
@@ -125,8 +122,8 @@ bool LCDIC2::reset() {
   return true;
 }
 
-void LCDIC2::rightToLeft() {
-  write(LCDIC2_MODE | (_gain = LCDIC2_DEC) << 1 | _shift);
+bool LCDIC2::rightToLeft() {
+  return write(LCDIC2_MODE | (_gain = LCDIC2_DEC) << 1 | _shift);
 }
 
 bool LCDIC2::write(uint8_t data, bool mode) {
@@ -135,6 +132,5 @@ bool LCDIC2::write(uint8_t data, bool mode) {
   Wire.write(0b1000);
   Wire.write(data << 4 | 0b100 | mode);
   Wire.write(0b1000);
-  Wire.endTransmission(1);
-  return flag();
+  return (Wire.endTransmission(1) == 0) && flag();
 }
