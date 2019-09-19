@@ -13,18 +13,22 @@ void LCDIC2::begin() {
   reset();
 
   Wire.beginTransmission(_address);
+  Wire.write(0b11); 
+  delayMicroseconds(4500);
+  Wire.write(0b11); 
+  delayMicroseconds(4500);
   Wire.write(0b11);
-  Wire.write(0b11);
-  Wire.write(0b11);
+  delayMicroseconds(150);
   Wire.write(0b10);
   Wire.endTransmission();
 
   write(LCDIC2_FUNCTION | LCDIC2_BITS_4 | LCDIC2_LINES_2 | LCDIC2_DOTS_8);
   write(LCDIC2_DISPLAY | _display << 2 | _cursor << 1 | _blink);
 
+  display(true);
   clear();
   leftToRight();
-  display(true);
+  home();
 }
 
 void LCDIC2::backlight(bool state) {
@@ -40,7 +44,7 @@ void LCDIC2::blink(bool state) {
 
 void LCDIC2::clear() {
   write(0b1);
-  flag();
+   delayMicroseconds(2000);
 }
 
 void LCDIC2::cursor(bool state) {
@@ -75,7 +79,7 @@ void LCDIC2::glyph(uint8_t character) {
   write(character, true);
 }
 
-void LCDIC2::glyph(uint8_t id, uint8_t map[]) {
+void LCDIC2::glyph(uint8_t id, uint8_t map[], uint8_t height) {
   write(LCDIC2_CGRAM | id << 3);
   for (uint8_t i = 0; i < 8; i++) write(map[i], true);
   write(LCDIC2_DDRAM);
@@ -83,7 +87,7 @@ void LCDIC2::glyph(uint8_t id, uint8_t map[]) {
 
 void LCDIC2::home() {
   write(0b10);
-  flag();
+   delayMicroseconds(2000);
 }
 
 void LCDIC2::leftToRight() {
@@ -122,11 +126,11 @@ void LCDIC2::rightToLeft() {
   write(LCDIC2_MODE | (_gain = LCDIC2_DEC) << 1 | _shift);
 }
 
-uint8_t LCDIC2::write(uint8_t data, bool mode = false) {
+uint8_t LCDIC2::write(uint8_t data, bool mode) {
   Wire.beginTransmission(_address);
   Wire.write(data & 0b11110000 | 0b100 | mode);
   Wire.write(0b1000);
-  Wire.write(data << 4 | 0b0100 | mode);
+  Wire.write(data << 4 | 0b100 | mode);
   Wire.write(0b1000);
   Wire.endTransmission();
   return flag();
