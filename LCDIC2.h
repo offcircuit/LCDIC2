@@ -35,6 +35,7 @@ class LCDIC2 {
     uint8_t _address, _height, _width;
     bool flag();
     bool reset();
+    bool send(uint8_t registry, uint8_t data);
     bool write(uint8_t data, bool mode = false);
 
   public:
@@ -57,14 +58,6 @@ class LCDIC2 {
     size_t print(String data);
     bool rightToLeft();
     bool shift(bool state);
-
-
-    bool send(uint8_t reg, uint8_t data) {
-      Wire.beginTransmission(_address);
-      Wire.write(reg);
-      Wire.write(data);
-      return (Wire.endTransmission(1) == 0) && flag();
-    }
 };
 
 #endif
