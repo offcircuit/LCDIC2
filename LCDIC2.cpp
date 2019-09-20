@@ -60,7 +60,7 @@ bool LCDIC2::flag() {
     Wire.beginTransmission(_address);
     Wire.write(0b1110);
     Wire.endTransmission(1);
-    Wire.requestFrom(uint8_t(_address), 1);
+    Wire.requestFrom(uint8_t(_address), uint8_t(1));
     while (!Wire.available());
   }  while ((Wire.read() << 4) > 127);
   return true;
@@ -108,29 +108,29 @@ bool LCDIC2::reset() {
   Wire.write(0b11);
   delayMicroseconds(4100);
   error = Wire.endTransmission(1);
-  Wire.requestFrom(_address, 1);
+  Wire.requestFrom(uint8_t(_address), uint8_t(1));
 
   Wire.beginTransmission(_address);
   Wire.write(0b11);
   delayMicroseconds(100);
   error |= Wire.endTransmission(1);
-  Wire.requestFrom(_address, 1);
+  Wire.requestFrom(uint8_t(_address), uint8_t(1));
 
   Wire.beginTransmission(_address);
   Wire.write(0b11);
   delayMicroseconds(100);
   error |= Wire.endTransmission(1);
-  Wire.requestFrom(_address, 1);
+  Wire.requestFrom(uint8_t(_address), uint8_t(1));
 
   Wire.beginTransmission(_address);
   Wire.write(0b10);
   delayMicroseconds(100);
   error |= Wire.endTransmission(1);
 
-  error |= send(0b0, LCDIC2_FUNCTION | LCDIC2_BITS_4 | LCDIC2_LINES_2 | LCDIC2_DOTS_8);
-  error |= send(0b10, 0b1000);
+  error |= send(0b10, LCDIC2_FUNCTION | LCDIC2_BITS_4 | LCDIC2_LINES_2 | LCDIC2_DOTS_8);
+  error |= send(0b0, LCDIC2_DISPLAY | _display << 2 | _cursor << 1 | _blink);
   error |= send(0b0, 0b1);
-  error |= send(0b0, _display << 2 | _cursor << 1 | _blink);
+  error |= send(0b0, LCDIC2_MODE | _gain << 1 | _shift);
 
   return !error;
 }
