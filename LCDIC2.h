@@ -35,8 +35,8 @@ class LCDIC2 {
     uint8_t _address, _height, _width;
     bool flag();
     bool reset();
-    void send(uint8_t registry, uint8_t data);
-    bool write(uint8_t data, bool mode = false);
+    bool send(uint8_t registry, uint8_t data);
+    bool write(uint8_t data, uint8_t mode = 0);
 
   public:
     LCDIC2(uint8_t address, uint8_t width, uint8_t height);
