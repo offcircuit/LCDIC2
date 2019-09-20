@@ -126,6 +126,7 @@ bool LCDIC2::reset() {
   Wire.write(0b10);
   delayMicroseconds(100);
   error |= Wire.endTransmission(1);
+  Wire.requestFrom(uint8_t(_address), uint8_t(1));
 
   error |= !send(0b10, LCDIC2_FUNCTION | LCDIC2_BITS_4 | LCDIC2_LINES_2 | LCDIC2_DOTS_8);
   error |= !send(0b0, LCDIC2_DISPLAY | _display << 2 | _cursor << 1 | _blink);
