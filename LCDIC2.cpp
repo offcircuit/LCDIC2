@@ -1,12 +1,5 @@
 #include "LCDIC2.h"
 
-/*
-  incompatibility with wire library
-  transmission always sends a nack
-  it must be because it is 4bit mode.
-  is working quite well
-*/
-
 LCDIC2::LCDIC2(uint8_t address, uint8_t width, uint8_t height) {
   _address = address;
   _height = height;
@@ -30,7 +23,7 @@ bool LCDIC2::begin() {
 bool LCDIC2::backlight(bool state) {
   Wire.beginTransmission(_address);
   Wire.write(state << 3);
-  Wire.endTransmission();
+  Wire.endTransmission(1);
   return flag();
 }
 
@@ -65,11 +58,11 @@ bool LCDIC2::display(bool state) {
 bool LCDIC2::flag() {
   do {
     Wire.beginTransmission(_address);
-    Wire.write(0b110);
+    Wire.write(0b1110);
     Wire.endTransmission(1);
-    Wire.requestFrom(uint8_t(_address), uint8_t(2));
-    while (Wire.available() < 2);
-  }  while ((Wire.read() << 4 | (Wire.read() && 0b00001111)) > 127);
+    Wire.requestFrom(uint8_t(_address), 1);
+    while (!Wire.available());
+  }  while ((Wire.read() << 4) > 127);
   return true;
 }
 
@@ -106,44 +99,62 @@ size_t LCDIC2::print(String data) {
 }
 
 bool LCDIC2::reset() {
+  bool error;
+
+  Wire.beginTransmission(_address);
+  Wire.endTransmission(1);
+
   Wire.beginTransmission(_address);
   Wire.write(0b11);
   delayMicroseconds(4100);
+  error = Wire.endTransmission(1);
+  Wire.requestFrom(_address, 1);
+
+  Wire.beginTransmission(_address);
   Wire.write(0b11);
   delayMicroseconds(100);
+  error |= Wire.endTransmission(1);
+  Wire.requestFrom(_address, 1);
+
+  Wire.beginTransmission(_address);
   Wire.write(0b11);
   delayMicroseconds(100);
+  error |= Wire.endTransmission(1);
+  Wire.requestFrom(_address, 1);
+
+  Wire.beginTransmission(_address);
   Wire.write(0b10);
-  Wire.endTransmission();
   delayMicroseconds(100);
-  send(0b0, LCDIC2_FUNCTION | LCDIC2_BITS_4 | LCDIC2_LINES_2 | LCDIC2_DOTS_8);
-  send(0b10, 0b1000);
-  send(0b0, 0b1);
-  send(0b0, _display << 2 | _cursor << 1 | _blink);
-  return true;
+  error |= Wire.endTransmission(1);
+
+  error |= send(0b0, LCDIC2_FUNCTION | LCDIC2_BITS_4 | LCDIC2_LINES_2 | LCDIC2_DOTS_8);
+  error |= send(0b10, 0b1000);
+  error |= send(0b0, 0b1);
+  error |= send(0b0, _display << 2 | _cursor << 1 | _blink);
+
+  return !error;
 }
 
 bool LCDIC2::rightToLeft() {
   return write(LCDIC2_MODE | (_gain = LCDIC2_DEC) << 1 | _shift);
 }
 
-void LCDIC2::send(uint8_t registry, uint8_t data) {
+bool LCDIC2::send(uint8_t registry, uint8_t data) {
   Wire.beginTransmission(_address);
   Wire.write(registry);
   Wire.write(data);
-  if (!Wire.endTransmission()) flag();
+  return !Wire.endTransmission(1) && flag();
 }
 
 bool LCDIC2::shift(bool state) {
   return write(LCDIC2_MODE | _gain << 1 | (_shift = state));
 }
 
-bool LCDIC2::write(uint8_t data, bool mode) {
+bool LCDIC2::write(uint8_t data, uint8_t mode) {
   Wire.beginTransmission(_address);
   Wire.write(data & 0b11110000 | 0b100 | mode);
   Wire.write(0b1000);
   Wire.write(data << 4 | 0b100 | mode);
   Wire.write(0b1000);
-  Wire.endTransmission();
-  return flag();
+  return !Wire.endTransmission(1) && flag();
 }
