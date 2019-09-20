@@ -9,15 +9,7 @@ LCDIC2::LCDIC2(uint8_t address, uint8_t width, uint8_t height) {
 bool LCDIC2::begin() {
   delay(500);
   Wire.begin(_address);
-
-  if (reset()) {
-    delayMicroseconds(2000);
-    backlight(true);
-    home();
-    clear();
-    return true;
-  }
-  return false;
+  return reset() && clear();
 }
 
 bool LCDIC2::backlight(bool state) {
@@ -58,7 +50,7 @@ bool LCDIC2::display(bool state) {
 bool LCDIC2::flag() {
   do {
     Wire.beginTransmission(_address);
-    Wire.write(0b1110);
+    Wire.write(0b110);
     Wire.endTransmission(1);
     Wire.requestFrom(uint8_t(_address), uint8_t(1));
     while (!Wire.available());
@@ -99,7 +91,7 @@ size_t LCDIC2::print(String data) {
 }
 
 bool LCDIC2::reset() {
-  bool error;
+  bool result;
 
   Wire.beginTransmission(_address);
   Wire.endTransmission(1);
@@ -107,44 +99,36 @@ bool LCDIC2::reset() {
   Wire.beginTransmission(_address);
   Wire.write(0b11);
   delayMicroseconds(4100);
-  error = Wire.endTransmission(1);
+  result = !Wire.endTransmission(1);
   Wire.requestFrom(uint8_t(_address), uint8_t(1));
 
   Wire.beginTransmission(_address);
   Wire.write(0b11);
   delayMicroseconds(100);
-  error |= Wire.endTransmission(1);
+  result &= !Wire.endTransmission(1);
   Wire.requestFrom(uint8_t(_address), uint8_t(1));
 
   Wire.beginTransmission(_address);
   Wire.write(0b11);
   delayMicroseconds(100);
-  error |= Wire.endTransmission(1);
+  result &= !Wire.endTransmission(1);
   Wire.requestFrom(uint8_t(_address), uint8_t(1));
 
   Wire.beginTransmission(_address);
   Wire.write(0b10);
   delayMicroseconds(100);
-  error |= Wire.endTransmission(1);
+  result &= !Wire.endTransmission(1);
   Wire.requestFrom(uint8_t(_address), uint8_t(1));
 
-  error |= !send(0b10, LCDIC2_FUNCTION | LCDIC2_BITS_4 | LCDIC2_LINES_2 | LCDIC2_DOTS_8);
-  error |= !send(0b0, LCDIC2_DISPLAY | _display << 2 | _cursor << 1 | _blink);
-  error |= !send(0b0, 0b1);
-  error |= !send(0b0, LCDIC2_MODE | _gain << 1 | _shift);
+  result &= write(LCDIC2_FUNCTION | LCDIC2_BITS_4 | LCDIC2_LINES_2 | LCDIC2_DOTS_8, 0b11);
+  result &= write(LCDIC2_DISPLAY | _display << 2 | _cursor << 1 | _blink);
+  result &= write(0b0, 0b1);
 
-  return !error;
+  return result & write(0b0, LCDIC2_MODE | _gain << 1 | _shift);
 }
 
 bool LCDIC2::rightToLeft() {
   return write(LCDIC2_MODE | (_gain = LCDIC2_DEC) << 1 | _shift);
-}
-
-bool LCDIC2::send(uint8_t registry, uint8_t data) {
-  Wire.beginTransmission(_address);
-  Wire.write(registry);
-  Wire.write(data);
-  return !Wire.endTransmission(1) && flag();
 }
 
 bool LCDIC2::shift(bool state) {
