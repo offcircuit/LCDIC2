@@ -33,13 +33,14 @@ class LCDIC2 {
   private:
     bool _blink = false, _cursor = true, _display = true, _gain = LCDIC2_INC, _shift = false;
     uint8_t _address, _height, _width;
-    bool command(uint8_t registry, uint8_t data);
     bool flag();
-    bool send(uint8_t registry, uint16_t wait = 0);
     bool write(uint8_t data, uint8_t rs = 0);
+    bool writeCommand(uint8_t registry, uint16_t wait = 0);
     void writeData(uint8_t data, uint8_t rs = 0);
     void writeHigh(uint8_t data, uint8_t rs = 0);
     void writeLow(uint8_t data, uint8_t rs = 0);
+    bool writeMessage(uint8_t registry, uint8_t data);
+
   public:
     LCDIC2(uint8_t address, uint8_t width, uint8_t height);
     bool begin();
