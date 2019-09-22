@@ -7,7 +7,7 @@ LCDIC2::LCDIC2(uint8_t address, uint8_t width, uint8_t height) {
 }
 
 bool LCDIC2::begin() {
-  delay(50);
+  wait(20000);
   Wire.begin(_address);
   Wire.beginTransmission(_address);
   Wire.endTransmission(1);
@@ -102,16 +102,20 @@ bool LCDIC2::shift(bool state) {
   return write(LCDIC2_MODE | _gain << 1 | (_shift = state));
 }
 
+void LCDIC2::wait(uint16_t us) {
+  for (uint32_t i = 1; i < ((us * (F_CPU / 1000L)) / 1000L); i++);
+}
+
 bool LCDIC2::write(uint8_t data, uint8_t rs) {
   Wire.beginTransmission(_address);
   writeData(data, rs);
   return !Wire.endTransmission(0) && flag();
 }
 
-bool LCDIC2::writeCommand(uint8_t registry, uint16_t wait) {
+bool LCDIC2::writeCommand(uint8_t registry, uint16_t us) {
   Wire.beginTransmission(_address);
   writeLow(registry);
-  delayMicroseconds(wait);
+  wait(us);
   return !Wire.endTransmission(0);
 }
 
