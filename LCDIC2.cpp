@@ -56,7 +56,7 @@ bool LCDIC2::display(bool state) {
 }
 
 bool LCDIC2::flag() {
-  do Wire.requestFrom(uint8_t(_address), uint8_t(1));
+  Wire.requestFrom(uint8_t(_address), uint8_t(1));
   while (!Wire.available());
   Wire.beginTransmission(_address);
   Wire.endTransmission(1);
