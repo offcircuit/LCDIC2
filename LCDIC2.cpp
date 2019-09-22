@@ -34,6 +34,7 @@ bool LCDIC2::blink(bool state) {
 bool LCDIC2::clear() {
   return write(0b1);
 }
+
 bool LCDIC2::cursor(bool state) {
   return write(LCDIC2_DISPLAY | _display << 2 | (_cursor = state) << 1 | _blink);
 }
