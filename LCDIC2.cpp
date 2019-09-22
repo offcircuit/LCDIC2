@@ -59,8 +59,7 @@ bool LCDIC2::flag() {
   Wire.requestFrom(uint8_t(_address), uint8_t(1));
   while (!Wire.available());
   Wire.beginTransmission(_address);
-  Wire.endTransmission(1);
-  return true;
+  return !Wire.endTransmission(1);
 }
 
 bool LCDIC2::glyph(uint8_t character) {
@@ -91,12 +90,7 @@ bool LCDIC2::moveRight() {
 
 size_t LCDIC2::print(String data) {
   size_t i = 0;
-  do {
-    Wire.beginTransmission(_address);
-    writeData(data[i], 1);
-    Wire.endTransmission(0);
-    flag();
-  } while (++i < data.length());
+  while (write(data[i], 0b1) && (++i < data.length()));
   return i;
 }
 
