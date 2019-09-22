@@ -2,16 +2,32 @@
 
 LCDIC2::LCDIC2(uint8_t address, uint8_t width, uint8_t height) {
   _address = address;
-  _height = height;
-  _width = width;
+
+  switch (height) {
+    case 1:
+      _height = height;
+      _width = width;
+      break;
+
+    case 2:
+      _height = height;
+      _width = width;
+      break;
+
+    case 4:
+      _height = height;
+      _width = width;
+      break;
+  }
 }
 
 bool LCDIC2::begin() {
   wait(20000);
   Wire.begin(_address);
   Wire.beginTransmission(_address);
-  Wire.endTransmission(1);
-  return  writeCommand(0b11, 4100)
+  return  (_height && _width)
+          & !Wire.endTransmission(1)
+          & writeCommand(0b11, 4100)
           & writeCommand(0b11, 100)
           & writeCommand(0b11, 100)
           & writeCommand(0b10, 100)
@@ -39,8 +55,19 @@ bool LCDIC2::cursor(bool state) {
   return write(LCDIC2_DISPLAY | _display << 2 | (_cursor = state) << 1 | _blink);
 }
 
-bool LCDIC2::cursor(uint8_t y, uint8_t x) {
-  return write(LCDIC2_DDRAM | (y < _height - 1 ? y : _height - 1) << 6 | (x < _width - 1 ? x : _width - 1));
+bool LCDIC2::cursor(uint8_t x, uint8_t y) {
+
+  bool b = _height == 4;
+
+  y = min(y, uint8_t(_height - 1));
+  x = min(x, uint8_t(_width - 1));
+
+
+
+
+  //  _ addr =;
+
+  return write(LCDIC2_DDRAM | y << 6 | x);
 }
 
 bool LCDIC2::cursorLeft() {
