@@ -34,7 +34,6 @@ bool LCDIC2::blink(bool state) {
 }
 
 bool LCDIC2::clear() {
-  delayMicroseconds(3000);
   return write(0b1);
 }
 
