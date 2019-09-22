@@ -45,7 +45,6 @@ class LCDIC2 {
   public:
     LCDIC2(uint8_t address, uint8_t width, uint8_t height);
     bool begin();
-    bool backlight(bool state);
     bool blink(bool state);
     bool clear();
     bool cursor(bool state);
