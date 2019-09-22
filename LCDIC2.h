@@ -2,7 +2,6 @@
 #define LCDIC2_H
 
 #include "Wire.h"
-#include "Arduino.h"
 
 #define LCDIC2_MODE         0b100
 #define LCDIC2_DISPLAY      0b1000
@@ -34,8 +33,9 @@ class LCDIC2 {
     bool _blink = false, _cursor = true, _display = true, _gain = LCDIC2_INC, _shift = false;
     uint8_t _address, _height, _width;
     bool flag();
+    void wait(uint16_t us);
     bool write(uint8_t data, uint8_t rs = 0);
-    bool writeCommand(uint8_t registry, uint16_t wait = 0);
+    bool writeCommand(uint8_t registry, uint16_t us = 0);
     void writeData(uint8_t data, uint8_t rs = 0);
     void writeHigh(uint8_t data, uint8_t rs = 0);
     void writeLow(uint8_t data, uint8_t rs = 0);
