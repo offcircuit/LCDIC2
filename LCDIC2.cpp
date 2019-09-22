@@ -89,7 +89,7 @@ bool LCDIC2::glyph(uint8_t id, uint8_t map[]) {
 }
 
 bool LCDIC2::home() {
-  return write(0b10);;
+  return write(0b10);
 }
 
 bool LCDIC2::leftToRight() {
