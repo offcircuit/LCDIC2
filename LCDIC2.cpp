@@ -2,23 +2,8 @@
 
 LCDIC2::LCDIC2(uint8_t address, uint8_t width, uint8_t height) {
   _address = address;
-
-  switch (height) {
-    case 1:
-      _height = height;
-      _width = width;
-      break;
-
-    case 2:
-      _height = height;
-      _width = width;
-      break;
-
-    case 4:
-      _height = height;
-      _width = width;
-      break;
-  }
+  _height = height;
+  _width = width;
 }
 
 bool LCDIC2::begin() {
@@ -56,18 +41,9 @@ bool LCDIC2::cursor(bool state) {
 }
 
 bool LCDIC2::cursor(uint8_t x, uint8_t y) {
-
-  bool b = _height == 4;
-
   y = min(y, uint8_t(_height - 1));
   x = min(x, uint8_t(_width - 1));
-
-
-
-
-  //  _ addr =;
-
-  return write(LCDIC2_DDRAM | y << 6 | x);
+  return write(LCDIC2_DDRAM | ((y % 2) * 0x40) + ((y / 2) * _width) | x);
 }
 
 bool LCDIC2::cursorLeft() {
