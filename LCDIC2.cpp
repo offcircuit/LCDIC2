@@ -9,6 +9,7 @@ LCDIC2::LCDIC2(uint8_t address, uint8_t width, uint8_t height) {
 bool LCDIC2::begin() {
   wait(20000);
   Wire.begin(_address);
+
   Wire.beginTransmission(_address);
   return  (_height && _width)
           & !Wire.endTransmission(1)
@@ -16,16 +17,11 @@ bool LCDIC2::begin() {
           & writeCommand(0b11, 100)
           & writeCommand(0b11, 100)
           & writeCommand(0b10, 100)
-          & writeMessage(0b10010, LCDIC2_BITS_4 | LCDIC2_LINES_2 | LCDIC2_DOTS_8)
+          & writeMessage(0b10010, LCDIC2_FUNCTION | LCDIC2_BITS_4 | LCDIC2_LINES_1 | LCDIC2_DOTS_10)
           & writeMessage(0b0, LCDIC2_DISPLAY | _display << 2 | _cursor << 1 | _blink)
           & writeMessage(0b0, 0b1)
-          & writeMessage(0b0, LCDIC2_MODE | _gain << 1 | _shift);
-}
-
-bool LCDIC2::backlight(bool state) {
-  Wire.beginTransmission(_address);
-  Wire.write(state << 3);
-  return !Wire.endTransmission(1);
+          & writeMessage(0b0, LCDIC2_MODE | _gain << 1 | _shift)
+          ;
 }
 
 bool LCDIC2::blink(bool state) {
