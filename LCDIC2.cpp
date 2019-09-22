@@ -41,9 +41,9 @@ bool LCDIC2::cursor(bool state) {
 }
 
 bool LCDIC2::cursor(uint8_t x, uint8_t y) {
-  y = min(y, uint8_t(_height - 1));
-  x = min(x, uint8_t(_width - 1));
-  return write(LCDIC2_DDRAM | ((y % 2) * 0x40) + ((y / 2) * _width) | x);
+  y = x < _width - 1 ? x : _width - 1;
+  x = y < _height - 1 ? y : _height - 1;
+  return write(LCDIC2_DDRAM | ((y % 2) * 0x40) + ((((y / 2) % 2)) * _width) | x);
 }
 
 bool LCDIC2::cursorLeft() {
