@@ -2,6 +2,7 @@
 #define LCDIC2_H
 
 #include "Wire.h"
+#include "Arduino.h"
 
 #define LCDIC2_MODE         0b100
 #define LCDIC2_DISPLAY      0b1000
@@ -41,16 +42,17 @@ class LCDIC2 {
     void writeLow(uint8_t data, uint8_t rs = 0);
 
   public:
+    const bool blink = _blink, cursor = _cursor, display = _display, gain = _gain, shift = _shift, backlight = _backlight;
     LCDIC2(uint8_t address, uint8_t width, uint8_t height, uint8_t dots = 8);
     bool begin();
-    bool backlight(bool state);
-    bool blink(bool state);
+    bool setBacklight(bool state);
+    bool setBlink(bool state);
     bool clear();
-    bool cursor(bool state);
-    bool cursor(uint8_t x, uint8_t y);
+    bool setCursor(bool state);
+    bool setCursor(uint8_t x, uint8_t y);
     bool cursorLeft();
     bool cursorRight();
-    bool display(bool state);
+    bool setDisplay(bool state);
     bool glyph(uint8_t character);
     bool glyph(uint8_t id, uint8_t map[]);
     bool home();
@@ -58,8 +60,9 @@ class LCDIC2 {
     bool moveLeft();
     bool moveRight();
     size_t print(String data);
+    uint8_t read(uint8_t data, uint8_t rs);
     bool rightToLeft();
-    bool shift(bool state);
+    bool setShift(bool state);
 };
 
 #endif
