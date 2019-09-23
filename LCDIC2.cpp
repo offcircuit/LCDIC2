@@ -45,7 +45,10 @@ bool LCDIC2::cursor(bool state) {
 bool LCDIC2::cursor(uint8_t x, uint8_t y) {
   x = x < uint8_t(_width - 1) ? x : uint8_t(_width - 1);
   y = y < uint8_t(_height - 1) ? y : uint8_t(_height - 1);
-  return write(LCDIC2_DDRAM | (y % 2) << 6 | (((y / 2) % 2) * _width) | x);
+
+
+  
+  return write(LCDIC2_DDRAM | (y % 2) << 6 | ((y / 2) * _width) | x);
 }
 
 bool LCDIC2::cursorLeft() {
