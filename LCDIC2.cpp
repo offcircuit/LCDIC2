@@ -2,7 +2,7 @@
 
 LCDIC2::LCDIC2(uint8_t address, uint8_t width, uint8_t height, bool font) {
   _address = address;
-  _font = font & (height == 1);
+  _font = font;
   _height = height;
   _width = width;
 }
@@ -17,7 +17,7 @@ bool LCDIC2::begin() {
           & send(0b11, 100)
           & send(0b11, 100)
           & send(0b10, 100)
-          & write(LCDIC2_FUNCTION | LCDIC2_BITS_4 | (_height > 1) << 3 | _font << 2)
+          & write(LCDIC2_FUNCTION | LCDIC2_BITS_4 | (_height > 1) << 3 | (_font & (_height == 1)) << 2)
           & write(LCDIC2_DISPLAY | _display << 2 | _cursor << 1 | _blink)
           & write(0b1)
           & write(LCDIC2_MODE | _gain << 1 | _shift)
@@ -111,7 +111,7 @@ bool LCDIC2::setDisplay(bool state) {
 }
 
 bool LCDIC2::setFont(bool font) {
-  return write(LCDIC2_FUNCTION | LCDIC2_BITS_4 | (_height > 1) << 3 | (_font = font) << 2) & write(0b1);
+  return write(LCDIC2_FUNCTION | LCDIC2_BITS_4 | (_height > 1) << 3 | ((_font = font) & (_height == 1)) << 2) & write(0b1);
 }
 
 bool LCDIC2::setLines(uint8_t height) {
