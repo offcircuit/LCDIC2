@@ -18,10 +18,10 @@ bool LCDIC2::begin() {
           & writeCommand(0b11, 100)
           & writeCommand(0b11, 100)
           & writeCommand(0b10, 100)
-          & writeMessage(0b100010, LCDIC2_FUNCTION | LCDIC2_BITS_4 | (_height > 1) << 3 | _dots << 2)
-          & writeMessage(0b0, LCDIC2_DISPLAY | _display << 2 | _cursor << 1 | _blink)
-          & writeMessage(0b0, 0b1)
-          & writeMessage(0b0, LCDIC2_MODE | _gain << 1 | _shift)
+          & write(LCDIC2_FUNCTION | LCDIC2_BITS_4 | (_height > 1) << 3 | _dots << 2)
+          & write(LCDIC2_DISPLAY | _display << 2 | _cursor << 1 | _blink)
+          & write(0b1)
+          & write(LCDIC2_MODE | _gain << 1 | _shift)
           ;
 }
 
@@ -104,6 +104,13 @@ bool LCDIC2::rightToLeft() {
   return write(LCDIC2_MODE | (_gain = LCDIC2_DEC) << 1 | _shift);
 }
 
+bool LCDIC2::send(uint8_t data, uint16_t us) {
+  Wire.beginTransmission(_address);
+  writeLow(data);
+  wait(us);
+  return !Wire.endTransmission(0);
+}
+
 bool LCDIC2::shift(bool state) {
   return write(LCDIC2_MODE | _gain << 1 | (_shift = state));
 }
@@ -114,20 +121,9 @@ void LCDIC2::wait(uint16_t us) {
 
 bool LCDIC2::write(uint8_t data, uint8_t rs) {
   Wire.beginTransmission(_address);
-  writeData(data, rs);
-  return !Wire.endTransmission(0) && flag();
-}
-
-bool LCDIC2::writeCommand(uint8_t registry, uint16_t us) {
-  Wire.beginTransmission(_address);
-  writeLow(registry);
-  wait(us);
-  return !Wire.endTransmission(0);
-}
-
-void LCDIC2::writeData(uint8_t data, uint8_t rs) {
   writeHigh(data, rs);
   writeLow(data, rs);
+  return !Wire.endTransmission(0) && flag();
 }
 
 void LCDIC2::writeHigh(uint8_t data, uint8_t rs) {
@@ -138,11 +134,4 @@ void LCDIC2::writeHigh(uint8_t data, uint8_t rs) {
 void LCDIC2::writeLow(uint8_t data, uint8_t rs) {
   Wire.write(data << 4 | 0b100 | rs | _backlight << 3);
   Wire.write(data << 4 & ~ 0b100 | _backlight << 3);
-}
-
-bool LCDIC2::writeMessage(uint8_t registry, uint8_t data) {
-  Wire.beginTransmission(_address);
-  writeData(registry);
-  writeData(data);
-  return !Wire.endTransmission(0) && flag();
 }
