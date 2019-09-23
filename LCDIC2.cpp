@@ -18,11 +18,17 @@ bool LCDIC2::begin() {
           & writeCommand(0b11, 100)
           & writeCommand(0b11, 100)
           & writeCommand(0b10, 100)
-          & writeMessage(0b10010, LCDIC2_FUNCTION | LCDIC2_BITS_4 | (_height > 1) << 3 | _dots << 2)
+          & writeMessage(0b100010, LCDIC2_FUNCTION | LCDIC2_BITS_4 | (_height > 1) << 3 | _dots << 2)
           & writeMessage(0b0, LCDIC2_DISPLAY | _display << 2 | _cursor << 1 | _blink)
           & writeMessage(0b0, 0b1)
           & writeMessage(0b0, LCDIC2_MODE | _gain << 1 | _shift)
           ;
+}
+
+bool LCDIC2::backlight(bool state) {
+  Wire.beginTransmission(_address);
+  Wire.write((_backlight = state) << 3);
+  return !Wire.endTransmission(0) && flag();
 }
 
 bool LCDIC2::blink(bool state) {
@@ -125,13 +131,13 @@ void LCDIC2::writeData(uint8_t data, uint8_t rs) {
 }
 
 void LCDIC2::writeHigh(uint8_t data, uint8_t rs) {
-  Wire.write(data & 0b11110000 | 0b1100 | rs);
-  Wire.write(data & 0b11110000 & ~ 0b100 | 0b1000);
+  Wire.write(data & 0b11110000 | 0b100 | rs | _backlight << 3);
+  Wire.write(data & 0b11110000 & ~ 0b100 | _backlight << 3);
 }
 
 void LCDIC2::writeLow(uint8_t data, uint8_t rs) {
-  Wire.write(data << 4 | 0b1100 | rs);
-  Wire.write(data << 4 & ~ 0b100 | 0b1000);
+  Wire.write(data << 4 | 0b100 | rs | _backlight << 3);
+  Wire.write(data << 4 & ~ 0b100 | _backlight << 3);
 }
 
 bool LCDIC2::writeMessage(uint8_t registry, uint8_t data) {
