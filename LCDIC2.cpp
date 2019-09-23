@@ -129,11 +129,11 @@ bool LCDIC2::write(uint8_t data, uint8_t rs) {
 }
 
 void LCDIC2::writeHigh(uint8_t data, uint8_t rs) {
-  Wire.write(data & 0b11110000 | _backlight << 3 | 0b100 | rs);
-  Wire.write(data & 0b11110000 | _backlight << 3);
+  Wire.write(data & 0b11110000 | rs | _backlight << 3 | 0b100);
+  Wire.write(data & 0b11110000 | rs | _backlight << 3);
 }
 
 void LCDIC2::writeLow(uint8_t data, uint8_t rs) {
-  Wire.write(data << 4 | _backlight << 3 | 0b100 | rs);
-  Wire.write(data << 4 | _backlight << 3);
+  Wire.write(data << 4 | rs | _backlight << 3 | 0b100);
+  Wire.write(data << 4 | rs | _backlight << 3);
 }
