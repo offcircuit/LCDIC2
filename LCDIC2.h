@@ -2,7 +2,6 @@
 #define LCDIC2_H
 
 #include "Wire.h"
-#include "Arduino.h"
 
 #define LCDIC2_MODE         0b100
 #define LCDIC2_DISPLAY      0b1000
@@ -31,7 +30,7 @@
 
 class LCDIC2 {
   private:
-    bool _blink = false, _cursor = true, _display = true, _gain = LCDIC2_INC, _shift = false, _dots, _backlight = true;
+    bool _backlight = true, _blink = false, _cursor = true, _display = true, _font = 0, _gain = LCDIC2_INC, _shift = false;
     uint8_t _address, _height = 0, _width = 0;
     uint8_t line[4];
     bool flag();
@@ -42,17 +41,12 @@ class LCDIC2 {
     void writeLow(uint8_t data, uint8_t rs = 0);
 
   public:
-    const bool blink = _blink, cursor = _cursor, display = _display, gain = _gain, shift = _shift, backlight = _backlight;
-    LCDIC2(uint8_t address, uint8_t width, uint8_t height, uint8_t dots = 8);
+    const bool backlight = _backlight, blink = _blink, cursor = _cursor, display = _display, font = _font, gain = _gain, shift = _shift;
+    LCDIC2(uint8_t address, uint8_t width, uint8_t height, bool font = 0);
     bool begin();
-    bool setBacklight(bool state);
-    bool setBlink(bool state);
     bool clear();
-    bool setCursor(bool state);
-    bool setCursor(uint8_t x, uint8_t y);
     bool cursorLeft();
     bool cursorRight();
-    bool setDisplay(bool state);
     bool glyph(uint8_t character);
     bool glyph(uint8_t id, uint8_t map[]);
     bool home();
@@ -62,6 +56,13 @@ class LCDIC2 {
     size_t print(String data);
     uint8_t read(uint8_t data, uint8_t rs);
     bool rightToLeft();
+    bool setBacklight(bool state);
+    bool setBlink(bool state);
+    bool setCursor(bool state);
+    bool setCursor(uint8_t x, uint8_t y);
+    bool setDisplay(bool state);
+    bool setFont(bool font);
+    bool setLines(uint8_t height);
     bool setShift(bool state);
 };
 
