@@ -55,7 +55,6 @@ class LCDIC2 {
     bool moveLeft();
     bool moveRight();
     size_t print(String data);
-    uint8_t read(uint8_t data, uint8_t rs);
     bool rightToLeft();
     bool setBacklight(bool state);
     bool setBlink(bool state);
