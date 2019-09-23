@@ -10,14 +10,13 @@ LCDIC2::LCDIC2(uint8_t address, uint8_t width, uint8_t height, uint8_t dots) {
 bool LCDIC2::begin() {
   wait(20000);
   Wire.begin(_address);
-
   Wire.beginTransmission(_address);
   return  (_height && _width)
           & !Wire.endTransmission(1)
-          & writeCommand(0b11, 4100)
-          & writeCommand(0b11, 100)
-          & writeCommand(0b11, 100)
-          & writeCommand(0b10, 100)
+          & send(0b11, 4100)
+          & send(0b11, 100)
+          & send(0b11, 100)
+          & send(0b10, 100)
           & write(LCDIC2_FUNCTION | LCDIC2_BITS_4 | (_height > 1) << 3 | _dots << 2)
           & write(LCDIC2_DISPLAY | _display << 2 | _cursor << 1 | _blink)
           & write(0b1)
