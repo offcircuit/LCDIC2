@@ -1,7 +1,8 @@
 #include "LCDIC2.h"
 
-LCDIC2::LCDIC2(uint8_t address, uint8_t width, uint8_t height) {
+LCDIC2::LCDIC2(uint8_t address, uint8_t width, uint8_t height, uint8_t dots) {
   _address = address;
+  _dots = (dots == 10) & (height == 1);
   _height = height;
   _width = width;
 }
@@ -17,7 +18,7 @@ bool LCDIC2::begin() {
           & writeCommand(0b11, 100)
           & writeCommand(0b11, 100)
           & writeCommand(0b10, 100)
-          & writeMessage(0b10010, LCDIC2_FUNCTION | LCDIC2_BITS_4 | LCDIC2_LINES_1 | LCDIC2_DOTS_10)
+          & writeMessage(0b10010, LCDIC2_FUNCTION | LCDIC2_BITS_4 | (_height > 1) << 3 | _dots << 2)
           & writeMessage(0b0, LCDIC2_DISPLAY | _display << 2 | _cursor << 1 | _blink)
           & writeMessage(0b0, 0b1)
           & writeMessage(0b0, LCDIC2_MODE | _gain << 1 | _shift)
