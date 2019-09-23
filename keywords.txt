@@ -13,13 +13,9 @@ LCDIC2	KEYWORD1
 #######################################
 
 begin	KEYWORD2
-backlight	KEYWORD2
-blink	KEYWORD2
 clear	KEYWORD2
-cursor	KEYWORD2
 cursorLeft	KEYWORD2
 cursorRight	KEYWORD2
-display	KEYWORD2
 glyph	KEYWORD2
 home	KEYWORD2
 leftToRight	KEYWORD2
@@ -27,9 +23,24 @@ moveLeft	KEYWORD2
 moveRight	KEYWORD2
 print	KEYWORD2
 rightToLeft	KEYWORD2
-shift	KEYWORD2
+setBacklight	KEYWORD2
+setBlink	KEYWORD2
+setCursor	KEYWORD2
+setDisplay	KEYWORD2
+setFont	KEYWORD2
+setLines	KEYWORD2
+setShift	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
 #######################################
 
+backlight	LITERAL1
+blink	LITERAL1
+cursor	LITERAL1
+display	LITERAL1
+font	LITERAL1
+gain	LITERAL1
+height	LITERAL1
+shift	LITERAL1
+width	LITERAL1
