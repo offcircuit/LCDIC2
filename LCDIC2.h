@@ -30,7 +30,7 @@
 
 class LCDIC2 {
   private:
-    bool _blink = false, _cursor = true, _display = true, _gain = LCDIC2_INC, _shift = false;
+    bool _blink = false, _cursor = true, _display = true, _gain = LCDIC2_INC, _shift = false, _dots;
     uint8_t _address, _height = 0, _width = 0;
     uint8_t line[4];
     bool flag();
@@ -43,7 +43,7 @@ class LCDIC2 {
     bool writeMessage(uint8_t registry, uint8_t data);
 
   public:
-    LCDIC2(uint8_t address, uint8_t width, uint8_t height);
+    LCDIC2(uint8_t address, uint8_t width, uint8_t height, uint8_t dots = 8);
     bool begin();
     bool blink(bool state);
     bool clear();
