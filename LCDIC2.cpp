@@ -61,8 +61,6 @@ bool LCDIC2::setDisplay(bool state) {
 }
 
 bool LCDIC2::flag() {
-  //delay(500);
-  //return 1;
   Wire.requestFrom(uint8_t(_address), uint8_t(2));
   while (Wire.available() < 2);
   Wire.beginTransmission(_address);
