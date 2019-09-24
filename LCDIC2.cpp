@@ -48,14 +48,14 @@ uint8_t LCDIC2::flag(uint8_t rs, bool enable) {
   return Wire.read();
 }
 
-bool LCDIC2::glyph(uint8_t character) {
-  return write(character, true);
+bool LCDIC2::glyph(uint8_t id) {
+  return write(id, 0b1);
 }
 
-bool LCDIC2::glyph(uint8_t id, uint8_t map[]) {
-  if (!write(LCDIC2_CGRAM | id << 3)) return false;
-  for (uint8_t i = 0; i < 8 + 2 * _font; i++) if (!write(map[i], 0b1)) return false;
-  return write(LCDIC2_DDRAM);
+int16_t LCDIC2::glyph(uint8_t id, uint8_t map[]) {
+  if (!write(LCDIC2_CGRAM | id << 3)) return -1;
+  for (uint8_t i = 0; i < 8 + 2 * _font; i++) if (!write(map[i], 0b1)) return -1;
+  return write(LCDIC2_DDRAM) * id;
 }
 
 bool LCDIC2::home() {
@@ -107,7 +107,14 @@ bool LCDIC2::setCursor(bool state) {
 }
 
 bool LCDIC2::setCursor(uint8_t x, uint8_t y) {
-  x = x < uint8_t(_width - 1) ? x : uint8_t(_width - 1);
+  uint8_t mw;
+  if (_height == 4)
+    if (_width == 16) mw = (y / 2) * 14 + 16;
+    else mw = _width;
+  else if (_height == 2) mw = 40;
+  else mw = _width;
+
+  x = x < uint8_t(mw - 1) ? x : uint8_t(mw - 1);
   y = y < uint8_t(_height - 1) ? y : uint8_t(_height - 1);
   return write(LCDIC2_DDRAM | (y % 2) << 6 | ((y / 2) * _width) | x);
 }
@@ -133,19 +140,19 @@ void LCDIC2::wait(uint16_t us) {
 }
 
 bool LCDIC2::write(uint8_t data, uint8_t rs) {
-  return writeHigh(data, rs) && busy() && writeLow(data, rs) && busy();
+  return writeHigh(data, rs) & busy() & writeLow(data, rs) & busy();
 }
 
 bool LCDIC2::writeHigh(uint8_t data, uint8_t rs) {
   Wire.beginTransmission(_address);
-  Wire.write(data & 0b11110000 | rs | _backlight << 3 | 0b100);
-  Wire.write(data & 0b11110000 | rs | _backlight << 3);
+  Wire.write(data & 0b11110000 | _backlight << 3 | rs | 0b100);
+  Wire.write(data & 0b11110000 | _backlight << 3 | rs);
   return !Wire.endTransmission(1);
 }
 
 bool LCDIC2::writeLow(uint8_t data, uint8_t rs) {
   Wire.beginTransmission(_address);
-  Wire.write(data << 4 | rs | _backlight << 3 | 0b100);
-  Wire.write(data << 4 | rs | _backlight << 3);
+  Wire.write(data << 4 | _backlight << 3 | rs | 0b100);
+  Wire.write(data << 4 | _backlight << 3 | rs);
   return !Wire.endTransmission(1);
 }
