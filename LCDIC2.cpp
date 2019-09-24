@@ -37,10 +37,14 @@ bool LCDIC2::cursorRight() {
 }
 
 bool LCDIC2::flag() {
-  Wire.requestFrom(uint8_t(_address), uint8_t(2));
-  while (Wire.available() < 2);
   Wire.beginTransmission(_address);
-  return !Wire.endTransmission(1);
+  Wire.write(0b1110);
+  Wire.write(0b1110);
+  Wire.endTransmission(1);
+  Wire.requestFrom(uint8_t(_address), uint8_t(2));
+  while (Wire.available() < 1);
+  //_busy = _busy ? (_busy | (Wire.read() >> 4)) : (Wire.read() & 0b11110000);
+  return true;
 }
 
 bool LCDIC2::glyph(uint8_t character) {
@@ -81,7 +85,8 @@ bool LCDIC2::rightToLeft() {
 
 bool LCDIC2::send(uint8_t data, uint16_t us) {
   Wire.beginTransmission(_address);
-  writeLow(data);
+  Wire.write(data << 4 | _backlight << 3 | 0b100);
+  Wire.write(data << 4 | _backlight << 3);
   wait(us);
   return !Wire.endTransmission(0);
 }
@@ -89,7 +94,7 @@ bool LCDIC2::send(uint8_t data, uint16_t us) {
 bool LCDIC2::setBacklight(bool state) {
   Wire.beginTransmission(_address);
   Wire.write((_backlight = state) << 3);
-  return !Wire.endTransmission(0) && flag();
+  return !Wire.endTransmission(1) && flag();
 }
 
 bool LCDIC2::setBlink(bool state) {
@@ -127,18 +132,20 @@ void LCDIC2::wait(uint16_t us) {
 }
 
 bool LCDIC2::write(uint8_t data, uint8_t rs) {
-  Wire.beginTransmission(_address);
-  writeHigh(data, rs);
-  writeLow(data, rs);
-  return !Wire.endTransmission(0) && flag();
+  _busy = 0;
+  return writeHigh(data, rs) && flag() && writeLow(data, rs) && flag();
 }
 
-void LCDIC2::writeHigh(uint8_t data, uint8_t rs) {
+bool LCDIC2::writeHigh(uint8_t data, uint8_t rs) {
+  Wire.beginTransmission(_address);
   Wire.write(data & 0b11110000 | rs | _backlight << 3 | 0b100);
   Wire.write(data & 0b11110000 | rs | _backlight << 3);
+  return !Wire.endTransmission(1);
 }
 
-void LCDIC2::writeLow(uint8_t data, uint8_t rs) {
+bool LCDIC2::writeLow(uint8_t data, uint8_t rs) {
+  Wire.beginTransmission(_address);
   Wire.write(data << 4 | rs | _backlight << 3 | 0b100);
   Wire.write(data << 4 | rs | _backlight << 3);
+  return !Wire.endTransmission(1);
 }
