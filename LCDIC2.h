@@ -72,10 +72,10 @@ class LCDIC2 {
       Wire.endTransmission(1);
       writeHigh(0b1111, 0b110);
       Wire.requestFrom(uint8_t(_address), uint8_t(2));
-      x = Wire.read();
+      y = Wire.read() >> 4;
       writeLow(0b1111, 0b110);
       Wire.requestFrom(uint8_t(_address), uint8_t(2));
-      x = Wire.read() & 0b11110000 | x >> 4;
+      x = Wire.read() & 0b11110000 | y;
       y = x > 0x39;
       x = x - y * 0x40;
     }
