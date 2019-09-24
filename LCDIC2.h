@@ -33,8 +33,8 @@ class LCDIC2 {
   private:
     bool _backlight = true, _blink = false, _cursor = true, _display = true, _font = 0, _gain = LCDIC2_INC, _shift = false;
     uint8_t _address, _height = 0, _width = 0;
-    uint8_t line[4];
-    bool flag();
+    bool busy();
+    uint8_t flag(uint8_t rs, bool enable = HIGH);
     bool send(uint8_t data, uint16_t us = 0);
     void wait(uint16_t us);
     bool write(uint8_t data, uint8_t rs = 0);
@@ -67,14 +67,15 @@ class LCDIC2 {
     bool setShift(bool state);
 
 
-    void getXY(uint8_t &x, uint8_t &y) {
+
+    void getCursor(uint8_t &x, uint8_t &y) {
       Wire.beginTransmission(_address);
       Wire.endTransmission(1);
-      writeHigh(0b1111, 0b110);
-      Wire.requestFrom(uint8_t(_address), uint8_t(2));
+      writeHigh(0b1111, 0b010);
+      Wire.requestFrom(uint8_t(_address), uint8_t(1));
       y = Wire.read() >> 4;
-      writeLow(0b1111, 0b110);
-      Wire.requestFrom(uint8_t(_address), uint8_t(2));
+      writeLow(0b1111, 0b010);
+      Wire.requestFrom(uint8_t(_address), uint8_t(1));
       x = Wire.read() & 0b11110000 | y;
       y = x > 0x39;
       x = x - y * 0x40;
