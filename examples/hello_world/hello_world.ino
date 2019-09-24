@@ -8,4 +8,5 @@ void setup() {
 }
 
 void loop() {
+  for (uint8_t i = 0; i < 16; i++) lcd.setCursor(i, 0);
 }
