@@ -31,16 +31,16 @@ setFont	KEYWORD2
 setLines	KEYWORD2
 setShift	KEYWORD2
 
-#######################################
-# Constants (LITERAL1)
-#######################################
+##################################################
+# Built-in variables			(LITERAL2)
+##################################################
 
-backlight	LITERAL1
-blink	LITERAL1
-cursor	LITERAL1
-display	LITERAL1
-font	LITERAL1
-gain	LITERAL1
-height	LITERAL1
-shift	LITERAL1
-width	LITERAL1
+backlight	LITERAL2
+blink	LITERAL2
+cursor	LITERAL2
+display	LITERAL2
+font	LITERAL2
+gain	LITERAL2
+height	LITERAL2
+shift	LITERAL2
+width	LITERAL2
