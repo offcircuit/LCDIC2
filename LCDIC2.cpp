@@ -39,11 +39,8 @@ bool LCDIC2::cursorRight() {
 bool LCDIC2::flag() {
   Wire.beginTransmission(_address);
   Wire.write(0b1110);
-  Wire.write(0b1110);
   Wire.endTransmission(1);
   Wire.requestFrom(uint8_t(_address), uint8_t(2));
-  while (Wire.available() < 1);
-  //_busy = _busy ? (_busy | (Wire.read() >> 4)) : (Wire.read() & 0b11110000);
   return true;
 }
 
@@ -132,7 +129,6 @@ void LCDIC2::wait(uint16_t us) {
 }
 
 bool LCDIC2::write(uint8_t data, uint8_t rs) {
-  _busy = 0;
   return writeHigh(data, rs) && flag() && writeLow(data, rs) && flag();
 }
 
