@@ -1,11 +1,6 @@
 #include "LCDIC2.h"
 
-LCDIC2::LCDIC2(uint8_t address, uint8_t width, uint8_t height, bool font) {
-  _address = address;
-  _font = font;
-  _height = height;
-  _width = width;
-}
+LCDIC2::LCDIC2(uint8_t address, uint8_t width, uint8_t height, bool font): _address(address), _font(font), _height(height), _width(width) {}
 
 bool LCDIC2::begin() {
   wait(20000);
@@ -20,13 +15,21 @@ bool LCDIC2::begin() {
          & write(LCDIC2_FUNCTION | LCDIC2_BITS_4 | (_height > 1) << 3 | (_font & (_height == 1)) << 2)
          & write(LCDIC2_DISPLAY | _display << 2 | _cursor << 1 | _blink)
          & write(0b1)
-         & write(LCDIC2_MODE | _gain << 1 | _shift)
-         ;
+         & write(LCDIC2_MODE | _gain << 1 | _shift);
 }
 
 bool LCDIC2::busy() {
-  while ((flag() & 0b11110000) > 0b10000000);
+  while ((flag() & 0b11110000 | flag() >> 4) > 0b10000000);
   return true;
+}
+
+uint8_t LCDIC2::charAt(uint8_t x, uint8_t y) {
+  uint8_t data = LCDIC2_DDRAM | (y % 2) << 6 | ((y / 2) * _width) | x;
+  getCursor(x, y);
+  write(data);
+  data = request(0b11);
+  setCursor(x, y);
+  return data;
 }
 
 bool LCDIC2::clear() {
@@ -44,9 +47,16 @@ bool LCDIC2::cursorRight() {
 uint8_t LCDIC2::flag() {
   Wire.beginTransmission(_address);
   Wire.write(_backlight << 3 | 0b10);
+  uint8_t i = Wire.endTransmission(0);
   Wire.requestFrom(uint8_t(_address), uint8_t(1), uint8_t(0));
-  Wire.endTransmission(0);
-  return Wire.read();
+  Serial.println(i);
+  return Serial.println(Wire.read(), HEX);
+}
+
+void LCDIC2::getCursor(uint8_t &x, uint8_t &y) {
+  x = request(0b10);
+  y = x > 0x39;
+  x = x - y * 0x40;
 }
 
 bool LCDIC2::glyph(uint8_t id) {
@@ -54,9 +64,9 @@ bool LCDIC2::glyph(uint8_t id) {
 }
 
 int16_t LCDIC2::glyph(uint8_t id, uint8_t map[]) {
-  if (!write(LCDIC2_CGRAM | id << 3)) return -1;
-  for (uint8_t i = 0; i < 8 + 2 * _font; i++) if (!write(map[i], 0b1)) return -1;
-  return write(LCDIC2_DDRAM) * id;
+  /*if (!write(LCDIC2_CGRAM | id << 3)) return -1;
+    for (uint8_t i = 0; i < 8 + 2 * _font; i++) if (!write(map[i], 0b1)) return -1;
+    return write(LCDIC2_DDRAM) * id;*/
 }
 
 bool LCDIC2::home() {
@@ -79,6 +89,15 @@ size_t LCDIC2::print(String data) {
   size_t i = 0;
   do write(data[i], 0b1); while (++i < data.length());
   return i;
+}
+
+uint8_t LCDIC2::request(uint8_t rs) {
+  writeHigh(0x7F, rs);
+  Wire.requestFrom(uint8_t(_address), uint8_t(1));
+  uint8_t data = Wire.read() & 0b11110000;
+  writeLow(0x7F, rs);
+  Wire.requestFrom(uint8_t(_address), uint8_t(1));
+  return data | Wire.read() >> 4;
 }
 
 bool LCDIC2::rightToLeft() {
@@ -108,11 +127,12 @@ bool LCDIC2::setCursor(bool state) {
 }
 
 bool LCDIC2::setCursor(uint8_t x, uint8_t y) {
-  uint8_t length;
-  if (_height == 4)
+  uint8_t length = 0x40;
+  /*if (_height == 4)
     if (_width == 16) length = 0x10 + (y / 2) * 0x0E;
     else if (_height == 2) length = 0x27;
-    else length = 0x4F;
+    else length = 0x4F;*/
+
 
   x = x < uint8_t(length - 1) ? x : uint8_t(length - 1);
   y = y < uint8_t(_height - 1) ? y : uint8_t(_height - 1);
