@@ -34,7 +34,7 @@ void LCDIC2::bounds(uint8_t &x, uint8_t &y) {
 }
 
 bool LCDIC2::busy() {
-  do flag(); while (flag() & 0b10000000);
+  while (flag() > 0b111);
   return true;
 }
 
