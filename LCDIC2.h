@@ -65,21 +65,6 @@ class LCDIC2 {
     bool setFont(bool font);
     bool setLines(uint8_t height);
     bool setShift(bool state);
-
-
-
-    void getCursor(uint8_t &x, uint8_t &y) {
-      Wire.beginTransmission(_address);
-      Wire.endTransmission(1);
-      writeHigh(0b1111, 0b010);
-      Wire.requestFrom(uint8_t(_address), uint8_t(1));
-      y = Wire.read() >> 4;
-      writeLow(0b1111, 0b010);
-      Wire.requestFrom(uint8_t(_address), uint8_t(1));
-      x = Wire.read() & 0b11110000 | y;
-      y = x > 0x39;
-      x = x - y * 0x40;
-    }
 };
 
 #endif
