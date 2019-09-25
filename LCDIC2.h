@@ -36,6 +36,7 @@ class LCDIC2 {
     uint8_t _address, _height = 0, _width = 0;
     bool busy();
     uint8_t flag();
+    uint8_t request(uint8_t rs);
     bool send(uint8_t data, uint16_t us = 0);
     void wait(uint16_t us);
     bool write(uint8_t data, uint8_t rs = 0);
@@ -47,9 +48,11 @@ class LCDIC2 {
     const uint8_t height = _height, width = _width;
     LCDIC2(uint8_t address, uint8_t width, uint8_t height, bool font = 0);
     bool begin();
+    uint8_t charAt(uint8_t x, uint8_t y);
     bool clear();
     bool cursorLeft();
     bool cursorRight();
+    void getCursor(uint8_t &x, uint8_t &y);
     bool glyph(uint8_t id);
     int16_t glyph(uint8_t id, uint8_t map[]);
     bool home();
