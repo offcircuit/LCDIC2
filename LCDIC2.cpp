@@ -119,7 +119,7 @@ bool LCDIC2::send(uint8_t data, uint16_t us) {
 bool LCDIC2::setBacklight(bool state) {
   Wire.beginTransmission(_address);
   Wire.write((_backlight = state) << 3);
-  return !Wire.endTransmission(1);
+  return !Wire.endTransmission(0);
 }
 
 bool LCDIC2::setBlink(bool state) {
