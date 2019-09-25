@@ -18,12 +18,23 @@ bool LCDIC2::begin() {
          & write(LCDIC2_MODE | _gain << 1 | _shift);
 }
 
+void LCDIC2::bounds(uint8_t &x, uint8_t &y) {
+  uint8_t length = 0x4F;
+  if (_height == 4)
+    if (_width == 16) length = 0x10 + (y / 2) * 0x0E;
+    else length = _width;
+  else if (_height == 2) length = 0x27;
+  x = x < uint8_t(length - 1) ? x : uint8_t(length - 1);
+  y = y < uint8_t(_height - 1) ? y : uint8_t(_height - 1);
+}
+
 bool LCDIC2::busy() {
   do flag(); while (flag() & 0b10000000);
   return true;
 }
 
 uint8_t LCDIC2::charAt(uint8_t x, uint8_t y) {
+  bounds(x, y);
   uint8_t data = LCDIC2_DDRAM | (y % 2) << 6 | ((y / 2) * _width) | x;
   getCursor(x, y);
   write(data);
@@ -120,14 +131,7 @@ bool LCDIC2::setCursor(bool state) {
 }
 
 bool LCDIC2::setCursor(uint8_t x, uint8_t y) {
-  uint8_t length = 0x4F;
-  if (_height == 4)
-    if (_width == 16) length = 0x10 + (y / 2) * 0x0E;
-    else length = _width;
-  else if (_height == 2) length = 0x27;
-
-  x = x < uint8_t(length - 1) ? x : uint8_t(length - 1);
-  y = y < uint8_t(_height - 1) ? y : uint8_t(_height - 1);
+  bounds(x, y);
   return write(LCDIC2_DDRAM | (y % 2) << 6 | ((y / 2) * _width) | x);
 }
 
