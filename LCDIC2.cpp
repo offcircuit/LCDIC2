@@ -96,16 +96,16 @@ bool LCDIC2::print(uint8_t glyph) {
 
 size_t LCDIC2::print(String data) {
   size_t i = 0;
-  do write(data[i], 0b1); while (++i < data.length());
+  while (write(data[i], 0b1) && ++i < data.length());
   return i;
 }
 
 uint8_t LCDIC2::request(uint8_t rs) {
   writeHigh(0b1111111, rs);
-  Wire.requestFrom(uint8_t(_address), uint8_t(1));
+  Wire.requestFrom(uint8_t(_address), uint8_t(1), uint8_t(0));
   uint8_t data = Wire.read() & 0b11110000;
   writeLow(0b1111111, rs);
-  Wire.requestFrom(uint8_t(_address), uint8_t(1));
+  Wire.requestFrom(uint8_t(_address), uint8_t(1), uint8_t(0));
   return data | Wire.read() >> 4;
 }
 
