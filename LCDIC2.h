@@ -40,6 +40,7 @@ class LCDIC2 {
     const uint8_t height = _height, width = _width;
     LCDIC2(uint8_t address, uint8_t width, uint8_t height, bool font = 0);
     bool begin();
+    bool end();
     uint8_t charAt(uint8_t x, uint8_t y);
     bool clear();
     bool cursorLeft();
