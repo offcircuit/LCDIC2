@@ -19,7 +19,7 @@ bool LCDIC2::begin() {
 }
 
 bool LCDIC2::busy() {
-  while ((flag() & 0b11110000 | flag() >> 4) > 0b10000000);
+  do flag(); while (flag() & 0b10000000);
   return true;
 }
 
@@ -47,10 +47,9 @@ bool LCDIC2::cursorRight() {
 uint8_t LCDIC2::flag() {
   Wire.beginTransmission(_address);
   Wire.write(_backlight << 3 | 0b10);
-  uint8_t i = Wire.endTransmission(0);
+  Wire.endTransmission(0);
   Wire.requestFrom(uint8_t(_address), uint8_t(1), uint8_t(0));
-  Serial.println(i);
-  return Serial.println(Wire.read(), HEX);
+  return Wire.read();
 }
 
 void LCDIC2::getCursor(uint8_t &x, uint8_t &y) {
@@ -61,12 +60,6 @@ void LCDIC2::getCursor(uint8_t &x, uint8_t &y) {
 
 bool LCDIC2::glyph(uint8_t id) {
   return write(id, 0b1);
-}
-
-int16_t LCDIC2::glyph(uint8_t id, uint8_t map[]) {
-  /*if (!write(LCDIC2_CGRAM | id << 3)) return -1;
-    for (uint8_t i = 0; i < 8 + 2 * _font; i++) if (!write(map[i], 0b1)) return -1;
-    return write(LCDIC2_DDRAM) * id;*/
 }
 
 bool LCDIC2::home() {
@@ -127,12 +120,11 @@ bool LCDIC2::setCursor(bool state) {
 }
 
 bool LCDIC2::setCursor(uint8_t x, uint8_t y) {
-  uint8_t length = 0x40;
-  /*if (_height == 4)
+  uint8_t length = 0x4F;
+  if (_height == 4)
     if (_width == 16) length = 0x10 + (y / 2) * 0x0E;
-    else if (_height == 2) length = 0x27;
-    else length = 0x4F;*/
-
+    else length = _width;
+  else if (_height == 2) length = 0x27;
 
   x = x < uint8_t(length - 1) ? x : uint8_t(length - 1);
   y = y < uint8_t(_height - 1) ? y : uint8_t(_height - 1);
@@ -145,6 +137,14 @@ bool LCDIC2::setDisplay(bool state) {
 
 bool LCDIC2::setFont(bool font) {
   return write(LCDIC2_FUNCTION | LCDIC2_BITS_4 | (_height > 1) << 3 | ((_font = font) & (_height == 1)) << 2) & write(0b1);
+}
+
+bool LCDIC2::setGlyph(uint8_t id, uint8_t map[]) {
+  uint8_t x, y;
+  getCursor(x, y);
+  if (!write(LCDIC2_CGRAM | id << 3)) return false;
+  for (uint8_t i = 0; i < 8 + 2 * _font; i++) if (!write(map[i], 0b1)) return false;
+  return setCursor(x, y);
 }
 
 bool LCDIC2::setLines(uint8_t height) {
