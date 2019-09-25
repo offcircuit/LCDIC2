@@ -38,7 +38,11 @@ bool LCDIC2::busy() {
   return true;
 }
 
-uint8_t LCDIC2::charAt(uint8_t x, uint8_t y) {
+bool LCDIC2::clear() {
+  return write(0b1);
+}
+
+char LCDIC2::charAt(uint8_t x, uint8_t y) {
   bounds(x, y);
   uint8_t data = LCDIC2_DDRAM | (y % 2) << 6 | ((y / 2) * _width) | x;
   getCursor(x, y);
@@ -46,10 +50,6 @@ uint8_t LCDIC2::charAt(uint8_t x, uint8_t y) {
   data = request(0b11);
   setCursor(x, y);
   return data;
-}
-
-bool LCDIC2::clear() {
-  return write(0b1);
 }
 
 bool LCDIC2::cursorLeft() {
