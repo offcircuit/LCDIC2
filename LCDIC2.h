@@ -31,10 +31,11 @@
 
 class LCDIC2 {
   private:
+  public:
     bool _backlight = true, _blink = false, _cursor = true, _display = true, _font = 0, _gain = LCDIC2_INC, _shift = false;
     uint8_t _address, _height = 0, _width = 0;
     bool busy();
-    uint8_t flag(uint8_t rs, bool enable = HIGH);
+    uint8_t flag();
     bool send(uint8_t data, uint16_t us = 0);
     void wait(uint16_t us);
     bool write(uint8_t data, uint8_t rs = 0);
@@ -49,8 +50,8 @@ class LCDIC2 {
     bool clear();
     bool cursorLeft();
     bool cursorRight();
-    bool glyph(uint8_t character);
-    bool glyph(uint8_t id, uint8_t map[]);
+    bool glyph(uint8_t id);
+    int16_t glyph(uint8_t id, uint8_t map[]);
     bool home();
     bool leftToRight();
     bool moveLeft();
