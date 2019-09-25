@@ -26,10 +26,10 @@ bool LCDIC2::end() {
 void LCDIC2::bounds(uint8_t &x, uint8_t &y) {
   uint8_t length = 0x4F;
   if (_height == 4)
-    if (_width == 16) length = 0x10 + (y / 2) * 0x0E;
-    else length = _width;
+    if (_width == 16) length = 0x0F + (y / 2) * 0x08;
+    else length = _width - 1;
   else if (_height == 2) length = 0x27;
-  x = x < uint8_t(length - 1) ? x : uint8_t(length - 1);
+  x = x < length ? x : length;
   y = y < uint8_t(_height - 1) ? y : uint8_t(_height - 1);
 }
 
