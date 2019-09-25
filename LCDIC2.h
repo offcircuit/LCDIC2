@@ -2,7 +2,6 @@
 #define LCDIC2_H
 
 #include "Wire.h"
-#include "Arduino.h"
 
 #define LCDIC2_MODE         0b100
 #define LCDIC2_DISPLAY      0b1000
@@ -12,13 +11,6 @@
 #define LCDIC2_DDRAM        0b10000000
 
 #define LCDIC2_BITS_4       0b0
-#define LCDIC2_BITS_8       0b10000
-
-#define LCDIC2_LINES_1      0b0
-#define LCDIC2_LINES_2      0b1000
-
-#define LCDIC2_DOTS_8       0b0
-#define LCDIC2_DOTS_10      0b100
 
 #define LCDIC2_CURSOR       0b0000
 #define LCDIC2_SHIFT        0b1000
@@ -32,9 +24,10 @@
 class LCDIC2 {
   private:
   public:
-    bool _backlight = true, _blink = false, _cursor = true, _display = true, _font = 0, _gain = LCDIC2_INC, _shift = false;
+    bool _backlight = true, _blink = false, _cursor = true, _display = true, _font = 0, _gain = true, _shift = false;
     uint8_t _address, _height = 0, _width = 0;
-    bool busy();
+     void bounds(uint8_t &x, uint8_t &y);
+   bool busy();
     uint8_t flag();
     uint8_t request(uint8_t rs);
     bool send(uint8_t data, uint16_t us = 0);
