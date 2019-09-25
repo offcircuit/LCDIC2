@@ -18,6 +18,11 @@ bool LCDIC2::begin() {
          & write(LCDIC2_MODE | _gain << 1 | _shift);
 }
 
+bool LCDIC2::end() {
+  Wire.beginTransmission(_address);
+  Wire.endTransmission(1);
+}
+
 void LCDIC2::bounds(uint8_t &x, uint8_t &y) {
   uint8_t length = 0x4F;
   if (_height == 4)
