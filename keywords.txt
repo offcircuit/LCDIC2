@@ -30,6 +30,7 @@ setBlink	KEYWORD2
 setCursor	KEYWORD2
 setDisplay	KEYWORD2
 setFont	KEYWORD2
+setGlyph	KEYWORD2
 setLines	KEYWORD2
 setShift	KEYWORD2
 
