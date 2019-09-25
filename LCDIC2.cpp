@@ -20,7 +20,7 @@ bool LCDIC2::begin() {
 
 bool LCDIC2::end() {
   Wire.beginTransmission(_address);
-  Wire.endTransmission(1);
+  return !Wire.endTransmission(1);
 }
 
 void LCDIC2::bounds(uint8_t &x, uint8_t &y) {
