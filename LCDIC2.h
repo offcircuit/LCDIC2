@@ -2,6 +2,7 @@
 #define LCDIC2_H
 
 #include "Wire.h"
+#include "Arduino.h"
 
 #define LCDIC2_MODE         0b100
 #define LCDIC2_DISPLAY      0b1000
@@ -26,9 +27,11 @@ class LCDIC2 {
     bool _backlight = true, _blink = false, _cursor = true, _display = true, _font = 0, _gain = true, _shift = false;
     uint8_t _address, _height = 0, _width = 0;
     void bounds(uint8_t &x, uint8_t &y);
+    uint8_t boundX(uint8_t y);
     bool busy();
     uint8_t flag();
     uint8_t request(uint8_t rs);
+    uint8_t row(uint8_t y);
     bool send(uint8_t data, uint16_t us = 0);
     void wait(uint16_t us);
     bool write(uint8_t data, uint8_t rs = 0);
@@ -63,6 +66,18 @@ class LCDIC2 {
     bool setLines(uint8_t height);
     bool setShift(bool state);
     bool sift(uint8_t glyph, uint8_t *&data);
+
+
+    uint8_t start(uint8_t y) {
+      return ((y % 2) << 6) + ((y / 2) * _width);
+    }
+
+    uint8_t length(uint8_t y) {
+      return (((0b1001 >> (_height > 2)) - (_width / _height == 4)) << 2 | 0b11) + (((_width / _height == 4) & (y / 2)) << 3);
+    }
+
+
+
 };
 
 #endif
