@@ -23,17 +23,6 @@ bool LCDIC2::end() {
   return !Wire.endTransmission(1);
 }
 
-void LCDIC2::bounds(uint8_t &x, uint8_t &y) {
-  uint8_t length=((y % 2) << 6) + ((y / 2) * _width);
-  if (_height == 4)
-    if (_width == 16) length += (y / 2) ? 0x17 : 0x0F;
-    else length += _width - 1;
-  else if (_height == 2) length += 0x27;
-  else length += 0x4F;
-  x = x < length ? x : length;
-  y = y < uint8_t(_height - 1) ? y : uint8_t(_height - 1);
-}
-
 bool LCDIC2::busy() {
   while (flag() > 0b1000);
   return true;
@@ -45,7 +34,7 @@ bool LCDIC2::clear() {
 
 char LCDIC2::charAt(uint8_t x, uint8_t y) {
   bounds(x, y);
-  uint8_t data = LCDIC2_DDRAM | (y % 2) << 6 | ((y / 2) * _width) | x;
+  uint8_t data = LCDIC2_DDRAM | start(y) | x;
   getCursor(x, y);
   write(data);
   data = request(0b11);
@@ -67,12 +56,6 @@ uint8_t LCDIC2::flag() {
   Wire.endTransmission(0);
   Wire.requestFrom(uint8_t(_address), uint8_t(1), uint8_t(0));
   return Wire.read();
-}
-
-void LCDIC2::getCursor(uint8_t &x, uint8_t &y) {
-  x = request(0b10);
-  y = x > 0x39;
-  x = x - (y % 2) * 0x40 - ((y / 2) * _width);
 }
 
 bool LCDIC2::home() {
@@ -134,11 +117,6 @@ bool LCDIC2::setBlink(bool state) {
 
 bool LCDIC2::setCursor(bool state) {
   return write(LCDIC2_DISPLAY | _display << 2 | (_cursor = state) << 1 | _blink);
-}
-
-bool LCDIC2::setCursor(uint8_t x, uint8_t y) {
-  bounds(x, y);
-  return write(LCDIC2_DDRAM | (y % 2) << 6 | ((y / 2) * _width) | x);
 }
 
 bool LCDIC2::setDisplay(bool state) {
