@@ -72,7 +72,7 @@ uint8_t LCDIC2::flag() {
 void LCDIC2::getCursor(uint8_t &x, uint8_t &y) {
   x = request(0b10);
   y = x > 0x39;
-  x = x - y * 0x40;
+  x = x - (y % 2) * 0x40 - ((y / 2) * _width);
 }
 
 bool LCDIC2::home() {
