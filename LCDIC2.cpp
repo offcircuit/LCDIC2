@@ -64,10 +64,16 @@ uint8_t LCDIC2::flag() {
 }
 
 void LCDIC2::getCursor(uint8_t &x, uint8_t &y) {
-  x = request(0b10);
-  y = 0;
-  while ((y < _height - 1) && (x > start((0b10011100 >> 6 - (2 * y)) & 0b11))) y++;
-  x = x - start((0b10011100 >> 6 - (2 * (y - 1))) & 0b11);
+ x = request(0b10);
+      if (_height == 1) y == 0;
+      else if (_height == 2) y = x > start(0);
+      else {
+        if (x > start(3)) y = 3;
+        else if (x > start(2)) y = 2;
+        else if (x > start(1)) y = 1;
+        else y = 0;
+      }
+      x = x - start(y);
 }
 
 bool LCDIC2::home() {
