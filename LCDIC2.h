@@ -73,7 +73,7 @@ class LCDIC2 {
     }
 
     uint8_t length(uint8_t y) {
-      return (((0b1001 >> (_height > 2)) - (_width / _height == 4)) << 2 | 0b11) + (((_width / _height == 4) & (y / 2)) << 3);
+      return h - 1 ? (((0b1001 >> (h > 2)) - (w / h == 4)) << 2 | 0b11) + (((w / h == 4) & (y / 2)) << 3) : 0b1001111;
     }
 
 
