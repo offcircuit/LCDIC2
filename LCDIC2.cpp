@@ -23,6 +23,11 @@ bool LCDIC2::end() {
   return !Wire.endTransmission(1);
 }
 
+void LCDIC2::bounds(uint8_t &x, uint8_t &y) {
+  y = min(y, uint8_t(_height - 1));
+  x = min(x, uint8_t(length(y)));
+}
+
 bool LCDIC2::busy() {
   while (flag() > 0b1000);
   return true;
@@ -34,7 +39,7 @@ bool LCDIC2::clear() {
 
 char LCDIC2::charAt(uint8_t x, uint8_t y) {
   bounds(x, y);
-  uint8_t data = LCDIC2_DDRAM | start(y) | x;
+  uint8_t data = LCDIC2_DDRAM + start(y) + x;
   getCursor(x, y);
   write(data);
   data = request(0b11);
@@ -58,12 +63,23 @@ uint8_t LCDIC2::flag() {
   return Wire.read();
 }
 
+void LCDIC2::getCursor(uint8_t &x, uint8_t &y) {
+  x = request(0b10);
+  y = 0;
+  while ((y < _height - 1) && (x > start((0b10011100 >> 6 - (2 * y)) & 0b11))) y++;
+  x = x - start((0b10011100 >> 6 - (2 * (y - 1))) & 0b11);
+}
+
 bool LCDIC2::home() {
   return write(0b10);
 }
 
 bool LCDIC2::leftToRight() {
   return write(LCDIC2_MODE | (_gain = LCDIC2_INC) << 1 | _shift);
+}
+
+uint8_t LCDIC2::length(uint8_t y) {
+  return (_height - 1) ? (((0b1001 >> (_height > 2)) - (_width / _height == 4)) << 2 | 0b11) + (((_width / _height == 4) & (y / 2)) << 3) : 0b1001111;
 }
 
 bool LCDIC2::moveLeft() {
@@ -119,6 +135,11 @@ bool LCDIC2::setCursor(bool state) {
   return write(LCDIC2_DISPLAY | _display << 2 | (_cursor = state) << 1 | _blink);
 }
 
+bool LCDIC2::setCursor(uint8_t x, uint8_t y) {
+  bounds(x, y);
+  return write(LCDIC2_DDRAM + start(y) + x);
+}
+
 bool LCDIC2::setDisplay(bool state) {
   return write(LCDIC2_DISPLAY | (_display = state) << 2 | _cursor << 1 | _blink);
 }
@@ -145,13 +166,17 @@ bool LCDIC2::setShift(bool state) {
 
 bool LCDIC2::sift(uint8_t glyph, uint8_t *&data) {
   uint8_t x, y;
-  getCursor(x, y);
   data = (uint8_t *) malloc(11);
+  getCursor(x, y);
   for (uint8_t i = 0; i < 11; i++) {
     write(LCDIC2_CGRAM | glyph | i);
     data[i] = request(0b11);
   }
   return setCursor(x, y);
+}
+
+uint8_t LCDIC2::start(uint8_t y) {
+  return ((y % 2) << 6) + ((y / 2) * _width);
 }
 
 void LCDIC2::wait(uint16_t us) {
