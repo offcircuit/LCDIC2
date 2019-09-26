@@ -69,8 +69,8 @@ void LCDIC2::getCursor(uint8_t &x, uint8_t &y) {
       if (_height == 2) y = x > start(0);
       else if (_height == 4) {
         if (x > start(3)) y = 3;
-        else if (x > start(2)) y = 2;
         else if (x > start(1)) y = 1;
+        else if (x > start(2)) y = 2;
       }
       x = x - start(y);
 }
