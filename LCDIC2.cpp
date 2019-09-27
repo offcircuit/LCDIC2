@@ -75,6 +75,17 @@ void LCDIC2::getCursor(uint8_t &x, uint8_t &y) {
   x -= start(y);
 }
 
+bool LCDIC2::getGlyph(uint8_t glyph, uint8_t *&data) {
+  uint8_t x, y;
+  data = (uint8_t *) malloc(11);
+  getCursor(x, y);
+  for (uint8_t i = 0; i < 1 << (3 + _font) ; i++) {
+    if (!write(LCDIC2_CGRAM | (glyph << (3 + _font)) | i)) return false;
+    data[i] = request(0b11);
+  }
+  return setCursor(x, y);
+}
+
 bool LCDIC2::home() {
   return write(0b10);
 }
@@ -167,17 +178,6 @@ bool LCDIC2::setLines(uint8_t height) {
 
 bool LCDIC2::setShift(bool state) {
   return write(LCDIC2_MODE | _gain << 1 | (_shift = state));
-}
-
-bool LCDIC2::sift(uint8_t glyph, uint8_t *&data) {
-  uint8_t x, y;
-  data = (uint8_t *) malloc(11);
-  getCursor(x, y);
-  for (uint8_t i = 0; i < 1 << (3 + _font) ; i++) {
-    if (!write(LCDIC2_CGRAM | (glyph << (3 + _font)) | i)) return false;
-    data[i] = request(0b11);
-  }
-  return setCursor(x, y);
 }
 
 uint8_t LCDIC2::start(uint8_t y) {
