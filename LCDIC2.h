@@ -49,6 +49,7 @@ class LCDIC2 {
     bool cursorLeft();
     bool cursorRight();
     void getCursor(uint8_t &x, uint8_t &y);
+    bool getGlyph(uint8_t glyph, uint8_t *&data);
     bool home();
     bool leftToRight();
     bool moveLeft();
@@ -65,7 +66,6 @@ class LCDIC2 {
     bool setGlyph(uint8_t glyph, uint8_t data[]);
     bool setLines(uint8_t height);
     bool setShift(bool state);
-    bool sift(uint8_t glyph, uint8_t *&data);
 };
 
 #endif
