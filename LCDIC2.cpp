@@ -7,15 +7,15 @@ bool LCDIC2::begin() {
   Wire.begin(_address);
   Wire.beginTransmission(_address);
   return (_height && _width)
-         & !Wire.endTransmission(1)
-         & send(0b11, 4100)
-         & send(0b11, 100)
-         & send(0b11, 100)
-         & send(0b10, 100)
-         & write(LCDIC2_FUNCTION | LCDIC2_BITS_4 | (_height > 1) << 3 | (_font & (_height == 1)) << 2)
-         & write(LCDIC2_DISPLAY | _display << 2 | _cursor << 1 | _blink)
-         & write(0b1)
-         & write(LCDIC2_MODE | _gain << 1 | _shift);
+         && !Wire.endTransmission(1)
+         && send(0b11, 4100)
+         && send(0b11, 100)
+         && send(0b11, 100)
+         && send(0b10, 100)
+         && write(LCDIC2_FUNCTION | LCDIC2_BITS_4 | (_height > 1) << 3 | (_font & (_height == 1)) << 2)
+         && write(LCDIC2_DISPLAY | _display << 2 | _cursor << 1 | _blink)
+         && write(0b1)
+         && write(LCDIC2_MODE | _gain << 1 | _shift);
 }
 
 bool LCDIC2::end() {
@@ -95,7 +95,7 @@ bool LCDIC2::leftToRight() {
 }
 
 uint8_t LCDIC2::length(uint8_t y) {
-  return (0x50 / _height) - (((_height == 4) & (_width == 16)) * (4 - ((y / 2) * 8)));
+  return (0x50 / _height) - (((_height == 4) && (_width == 16)) * (4 - ((y / 2) * 8)));
 }
 
 bool LCDIC2::moveLeft() {
@@ -161,7 +161,7 @@ bool LCDIC2::setDisplay(bool state) {
 }
 
 bool LCDIC2::setFont(bool font) {
-  return write(LCDIC2_FUNCTION | LCDIC2_BITS_4 | (_height > 1) << 3 | ((_font = font) & (_height == 1)) << 2) & write(0b1);
+  return write(LCDIC2_FUNCTION | LCDIC2_BITS_4 | (_height > 1) << 3 | ((_font = font) & (_height == 1)) << 2) && write(0b1);
 }
 
 bool LCDIC2::setGlyph(uint8_t glyph, uint8_t data[]) {
@@ -173,7 +173,7 @@ bool LCDIC2::setGlyph(uint8_t glyph, uint8_t data[]) {
 }
 
 bool LCDIC2::setLines(uint8_t height) {
-  return write(LCDIC2_FUNCTION | LCDIC2_BITS_4 | ((_height = height) > 1) << 3 | (_font & (height == 1)) << 2) & write(0b1);
+  return write(LCDIC2_FUNCTION | LCDIC2_BITS_4 | ((_height = height) > 1) << 3 | (_font & (height == 1)) << 2) && write(0b1);
 }
 
 bool LCDIC2::setShift(bool state) {
@@ -189,7 +189,7 @@ void LCDIC2::wait(uint16_t us) {
 }
 
 bool LCDIC2::write(uint8_t data, uint8_t rs) {
-  return writeHigh(data, rs) & busy() & writeLow(data, rs) & busy();
+  return writeHigh(data, rs) && busy() && writeLow(data, rs) && busy();
 }
 
 bool LCDIC2::writeHigh(uint8_t data, uint8_t rs) {
