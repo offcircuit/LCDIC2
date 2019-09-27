@@ -173,7 +173,7 @@ bool LCDIC2::sift(uint8_t glyph, uint8_t *&data) {
   uint8_t x, y;
   data = (uint8_t *) malloc(11);
   getCursor(x, y);
-  for (uint8_t i = 0; i < i < 1 << (3 + _font) ; i++) {
+  for (uint8_t i = 0; i < 1 << (3 + _font) ; i++) {
     if (!write(LCDIC2_CGRAM | (glyph << (3 + _font)) | i)) return false;
     data[i] = request(0b11);
   }
