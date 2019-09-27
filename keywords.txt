@@ -18,6 +18,7 @@ clear	KEYWORD2
 cursorLeft	KEYWORD2
 cursorRight	KEYWORD2
 getCursor	KEYWORD2
+getGlyph	KEYWORD2
 home	KEYWORD2
 leftToRight	KEYWORD2
 moveLeft	KEYWORD2
@@ -32,7 +33,6 @@ setFont	KEYWORD2
 setGlyph	KEYWORD2
 setLines	KEYWORD2
 setShift	KEYWORD2
-sift	KEYWORD2
 
 ##################################################
 # Built-in variables			(LITERAL2)
