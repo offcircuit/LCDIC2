@@ -84,7 +84,7 @@ bool LCDIC2::leftToRight() {
 }
 
 uint8_t LCDIC2::length(uint8_t y) {
-  return (80 / (_height + ((_width % 5) & (_width >> _height)))) + (((_width % 5) & (_width >> _height) & (y / 2)) << 3);
+  return (80 / _height) + (((_width % 5) & (_width >> _height)) * (1 - ((y < 2) * 2)) * 4);
 }
 
 bool LCDIC2::moveLeft() {
