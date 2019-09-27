@@ -66,11 +66,11 @@ uint8_t LCDIC2::flag() {
 void LCDIC2::getCursor(uint8_t &x, uint8_t &y) {
   x = request(0b10);
   y = 0;
-  if (_height == 2) y = x > start(0);
+  if (_height == 2) y = x >= start(0);
   else if (_height == 4) {
-    if (x > start(3)) y = 3;
-    else if (x > start(1)) y = 1;
-    else if (x > start(2)) y = 2;
+    if (x >= start(3)) y = 3;
+    else if (x >= start(1)) y = 1;
+    else if (x >= start(2)) y = 2;
   }
   x = x - start(y);
 }
@@ -78,13 +78,13 @@ void LCDIC2::getCursor(uint8_t &x, uint8_t &y) {
 bool LCDIC2::home() {
   return write(0b10);
 }
-
+                             
 bool LCDIC2::leftToRight() {
   return write(LCDIC2_MODE | (_gain = LCDIC2_INC) << 1 | _shift);
 }
 
 uint8_t LCDIC2::length(uint8_t y) {
-  return (_height - 1) ? (((0b1001 >> (_height > 2)) - (_width / _height == 4)) << 2 | 0b11) + (((_width / _height == 4) & (y / 2)) << 3) : 0b1001111;
+  return (80 / (_height + ((_width % 5) & (_width >> _height)))) + (((_width % 5) & (_width >> _height) & (y / 2)) << 3);
 }
 
 bool LCDIC2::moveLeft() {
