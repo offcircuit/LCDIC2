@@ -2,7 +2,6 @@
 #define LCDIC2_H
 
 #include "Wire.h"
-#include "Arduino.h"
 
 #define LCDIC2_MODE         0b100
 #define LCDIC2_DISPLAY      0b1000
