@@ -24,8 +24,8 @@ bool LCDIC2::end() {
 }
 
 void LCDIC2::bounds(uint8_t &x, uint8_t &y) {
-  y = y > (_height - 1) ? _height - 1 : y;
-  x = x > length(y) ? length(y) : x;
+  y = y > (_height - 1) ? (_height - 1) : y;
+  x = x > (length(y) - 1) ? (length(y) - 1) : x;
 }
 
 bool LCDIC2::busy() {
