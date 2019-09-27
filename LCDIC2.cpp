@@ -72,19 +72,20 @@ void LCDIC2::getCursor(uint8_t &x, uint8_t &y) {
     else if (x >= start(1)) y = 1;
     else if (x >= start(2)) y = 2;
   }
-  x = x - start(y);
+  x -= start(y);
 }
 
 bool LCDIC2::home() {
   return write(0b10);
 }
-                             
+
 bool LCDIC2::leftToRight() {
   return write(LCDIC2_MODE | (_gain = LCDIC2_INC) << 1 | _shift);
 }
 
 uint8_t LCDIC2::length(uint8_t y) {
-  return (80 / _height) + (((_width % 5) & (_width >> _height)) * (1 - ((y < 2) * 2)) * 4);
+  return (80 / _height) + (((_height == 4) & (_width == 16)) * (1 - ((y < 2) * 2)) * 4);
+  //return (80 / _height) + (((_width % 5) & (_width >> _height)) * (1 - ((y < 2) * 2)) * 4);
 }
 
 bool LCDIC2::moveLeft() {
@@ -96,7 +97,7 @@ bool LCDIC2::moveRight() {
 }
 
 bool LCDIC2::print(uint8_t glyph) {
-  return write(glyph, 0b1);
+  return write(glyph << _font, 0b1);
 }
 
 size_t LCDIC2::print(String data) {
@@ -156,8 +157,8 @@ bool LCDIC2::setFont(bool font) {
 bool LCDIC2::setGlyph(uint8_t glyph, uint8_t data[]) {
   uint8_t x, y;
   getCursor(x, y);
-  if (!write(LCDIC2_CGRAM | glyph << 3)) return false;
-  for (uint8_t i = 0; i < 8 + 2 * _font; i++) if (!write(data[i], 0b1)) return false;
+  if (!write(LCDIC2_CGRAM | (glyph << (3 + _font)))) return false;
+  for (uint8_t i = 0; i < 1 << (3 + _font); i++) if (!write((i > 8 + 2 * _font ? 0 : data[i]), 0b1)) return false;
   return setCursor(x, y);
 }
 
