@@ -25,6 +25,7 @@ class LCDIC2 {
   private:
     bool _backlight = true, _blink = false, _cursor = true, _display = true, _font = 0, _gain = true, _shift = false;
     uint8_t _address, _height = 0, _width = 0;
+
     void bounds(uint8_t &x, uint8_t &y);
     bool busy();
     uint8_t flag();
@@ -39,6 +40,7 @@ class LCDIC2 {
   public:
     const bool backlight = _backlight, blink = _blink, cursor = _cursor, display = _display, font = _font, gain = _gain, shift = _shift;
     const uint8_t height = _height, width = _width;
+
     LCDIC2(uint8_t address, uint8_t width, uint8_t height, bool font = 0);
     bool begin();
     bool end();
@@ -53,7 +55,7 @@ class LCDIC2 {
     bool moveLeft();
     bool moveRight();
     bool print(uint8_t glyph);
-    size_t print(String data);
+    uint8_t print(String data);
     bool rightToLeft();
     bool setBacklight(bool state);
     bool setBlink(bool state);

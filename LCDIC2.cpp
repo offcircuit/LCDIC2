@@ -10,11 +10,11 @@ bool LCDIC2::begin() {
          & !Wire.endTransmission(1)
          & writeLow(0b11)
          & wait(4100)
-         & writeLow(0b11)        
+         & writeLow(0b11)
          & wait(100)
-         & writeLow(0b11)         
+         & writeLow(0b11)
          & wait(100)
-         & writeLow(0b10)         
+         & writeLow(0b10)
          & wait(100)
          & write(LCDIC2_FUNCTION | LCDIC2_BITS_4 | (_height > 1) << 3 | (_font & (_height == 1)) << 2)
          & write(LCDIC2_DISPLAY | _display << 2 | _cursor << 1 | _blink)
@@ -34,12 +34,12 @@ void LCDIC2::bounds(uint8_t &x, uint8_t &y) {
 }
 
 bool LCDIC2::busy() {
-  while (flag() > 0b1000);
+  while (flag() > 0b10000000);
   return true;
 }
 
 bool LCDIC2::clear() {
-  return write(0b1);
+  return write(0b1) & wait(4400);
 }
 
 char LCDIC2::charAt(uint8_t x, uint8_t y) {
@@ -61,11 +61,9 @@ bool LCDIC2::cursorRight() {
 }
 
 uint8_t LCDIC2::flag() {
-  Wire.beginTransmission(_address);
-  Wire.write(_backlight << 3 | 0b10);
-  Wire.endTransmission(0);
   Wire.requestFrom(uint8_t(_address), uint8_t(1), uint8_t(0));
-  return Wire.read();
+  while (Wire.available() < 1);
+  return bool(Wire.read());
 }
 
 void LCDIC2::getCursor(uint8_t &x, uint8_t &y) {
@@ -115,8 +113,8 @@ bool LCDIC2::print(uint8_t glyph) {
   return write(glyph << _font, 0b1);
 }
 
-size_t LCDIC2::print(String data) {
-  size_t i = 0;
+uint8_t LCDIC2::print(String data) {
+  uint8_t i = 0;
   while (write(data[i], 0b1) && ++i < data.length());
   return i;
 }
@@ -124,9 +122,11 @@ size_t LCDIC2::print(String data) {
 uint8_t LCDIC2::request(uint8_t rs) {
   writeHigh(0b11111111, rs);
   Wire.requestFrom(uint8_t(_address), uint8_t(1), uint8_t(0));
+  while (Wire.available() < 1);
   uint8_t data = Wire.read() & 0b11110000;
   writeLow(0b11111111, rs);
   Wire.requestFrom(uint8_t(_address), uint8_t(1), uint8_t(0));
+  while (Wire.available() < 1);
   return data | Wire.read() >> 4;
 }
 
@@ -187,17 +187,19 @@ bool LCDIC2::wait(uint16_t us) {
 }
 
 bool LCDIC2::write(uint8_t data, uint8_t rs) {
-  return writeHigh(data, rs) && busy() && writeLow(data, rs) && busy();
+  writeHigh(data, rs) && busy() && writeLow(data, rs) && busy();
 }
 
 bool LCDIC2::writeHigh(uint8_t data, uint8_t rs) {
   Wire.beginTransmission(_address);
-  Wire.write(data & 0b11110000 | _backlight << 3 | 0b100 | rs);
+  Wire.write((data & 0b11110000) | (_backlight << 3) | rs | 0b100);
+  Wire.write((data & 0b11110000) | (_backlight << 3) | rs);
   return !Wire.endTransmission(0);
 }
 
 bool LCDIC2::writeLow(uint8_t data, uint8_t rs) {
   Wire.beginTransmission(_address);
-  Wire.write(data << 4 | _backlight << 3 | 0b100 | rs);
+  Wire.write((data << 4) | (_backlight << 3) | rs | 0b100);
+  Wire.write((data << 4) | (_backlight << 3) | rs);
   return !Wire.endTransmission(0);
 }
