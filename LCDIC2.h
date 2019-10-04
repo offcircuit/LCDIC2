@@ -28,7 +28,6 @@ class LCDIC2 {
 
     void bounds(uint8_t &x, uint8_t &y);
     bool busy();
-    uint8_t flag();
     uint8_t length(uint8_t y);
     uint8_t request(uint8_t rs);
     uint8_t start(uint8_t y);
