@@ -23,9 +23,7 @@ class LCDIC2 {
     bool _backlight = true, _blink = false, _cursor = true, _display = true, _font = 0, _gain = true, _shift = false;
     uint8_t _address, _height = 0, _width = 0;
 
-    void bounds(uint8_t &x, uint8_t &y);
     bool busy();
-    uint8_t length(uint8_t y);
     uint8_t request(uint8_t rs);
     uint8_t start(uint8_t y);
     bool wait(uint16_t us);

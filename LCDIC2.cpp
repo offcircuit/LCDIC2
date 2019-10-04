@@ -18,11 +18,6 @@ bool LCDIC2::begin() {
          ;
 }
 
-void LCDIC2::bounds(uint8_t &x, uint8_t &y) {
-  y = y > (_height - 1) ? (_height - 1) : y;
-  x = x > (length(y) - 1) ? (length(y) - 1) : x;
-}
-
 bool LCDIC2::busy() {
   while (request(0b10) > 0b10000000);
   return true;
@@ -33,7 +28,6 @@ bool LCDIC2::clear() {
 }
 
 char LCDIC2::charAt(uint8_t x, uint8_t y) {
-  bounds(x, y);
   uint8_t data = LCDIC2_DDRAM + start(y) + x;
   getCursor(x, y);
   write(data);
@@ -79,10 +73,6 @@ bool LCDIC2::home() {
 
 bool LCDIC2::leftToRight() {
   return write(LCDIC2_MODE | (_gain = 1) << 1 | _shift);
-}
-
-uint8_t LCDIC2::length(uint8_t y) {
-  return (0x50 / _height) - (((_height == 4) && (_width == 16)) * (4 - ((y / 2) * 8)));
 }
 
 bool LCDIC2::moveLeft() {
@@ -131,7 +121,6 @@ bool LCDIC2::setCursor(bool state) {
 }
 
 bool LCDIC2::setCursor(uint8_t x, uint8_t y) {
-  bounds(x, y);
   return write(LCDIC2_DDRAM + start(y) + x);
 }
 
