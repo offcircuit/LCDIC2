@@ -6,8 +6,9 @@ bool LCDIC2::begin() {
   wait(20000);
   Wire.begin(_address);
   Wire.beginTransmission(_address);
+  Wire.endTransmission(1);
+
   return (_height && _width)
-         & !Wire.endTransmission(1)
          & writeLow(0b11)
          & wait(4100)
          & writeLow(0b11)
@@ -23,18 +24,13 @@ bool LCDIC2::begin() {
          ;
 }
 
-bool LCDIC2::end() {
-  Wire.beginTransmission(_address);
-  return !Wire.endTransmission(1);
-}
-
 void LCDIC2::bounds(uint8_t &x, uint8_t &y) {
   y = y > (_height - 1) ? (_height - 1) : y;
   x = x > (length(y) - 1) ? (length(y) - 1) : x;
 }
 
 bool LCDIC2::busy() {
-  while (flag() > 0b10000000);
+  while (flag() > 0b1000);
   return true;
 }
 
@@ -61,9 +57,12 @@ bool LCDIC2::cursorRight() {
 }
 
 uint8_t LCDIC2::flag() {
+  Wire.beginTransmission(_address);
+  Wire.write(_backlight << 3 | 0b10);
+  Wire.endTransmission(0);
   Wire.requestFrom(uint8_t(_address), uint8_t(1), uint8_t(0));
-  while (Wire.available() < 1);
-  return bool(Wire.read());
+  //while (Wire.available() < 1);
+  return Wire.read();
 }
 
 void LCDIC2::getCursor(uint8_t &x, uint8_t &y) {
@@ -187,19 +186,17 @@ bool LCDIC2::wait(uint16_t us) {
 }
 
 bool LCDIC2::write(uint8_t data, uint8_t rs) {
-  writeHigh(data, rs) && busy() && writeLow(data, rs) && busy();
+  return writeHigh(data, rs) && busy() && writeLow(data, rs) && busy();
 }
 
 bool LCDIC2::writeHigh(uint8_t data, uint8_t rs) {
   Wire.beginTransmission(_address);
   Wire.write((data & 0b11110000) | (_backlight << 3) | rs | 0b100);
-  Wire.write((data & 0b11110000) | (_backlight << 3) | rs);
   return !Wire.endTransmission(0);
 }
 
 bool LCDIC2::writeLow(uint8_t data, uint8_t rs) {
   Wire.beginTransmission(_address);
   Wire.write((data << 4) | (_backlight << 3) | rs | 0b100);
-  Wire.write((data << 4) | (_backlight << 3) | rs);
   return !Wire.endTransmission(0);
 }

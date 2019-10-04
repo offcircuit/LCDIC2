@@ -43,7 +43,6 @@ class LCDIC2 {
 
     LCDIC2(uint8_t address, uint8_t width, uint8_t height, bool font = 0);
     bool begin();
-    bool end();
     char charAt(uint8_t x, uint8_t y);
     bool clear();
     bool cursorLeft();
