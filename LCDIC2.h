@@ -18,9 +18,6 @@
 #define LCDIC2_LEFT         0b000
 #define LCDIC2_RIGHT        0b100
 
-#define LCDIC2_DEC          0b0
-#define LCDIC2_INC          0b1
-
 class LCDIC2 {
   private:
     bool _backlight = true, _blink = false, _cursor = true, _display = true, _font = 0, _gain = true, _shift = false;
@@ -47,7 +44,7 @@ class LCDIC2 {
     bool cursorLeft();
     bool cursorRight();
     void getCursor(uint8_t &x, uint8_t &y);
-    bool getGlyph(uint8_t glyph, uint8_t *&data);
+    bool getGlyph(uint8_t glyph, uint8_t *&buffer);
     bool home();
     bool leftToRight();
     bool moveLeft();
@@ -61,7 +58,7 @@ class LCDIC2 {
     bool setCursor(uint8_t x, uint8_t y);
     bool setDisplay(bool state);
     bool setFont(bool font);
-    bool setGlyph(uint8_t glyph, uint8_t data[]);
+    bool setGlyph(uint8_t glyph, uint8_t buffer[]);
     bool setLines(uint8_t height);
     bool setShift(bool state);
 };
