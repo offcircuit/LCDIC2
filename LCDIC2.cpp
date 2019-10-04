@@ -119,7 +119,7 @@ bool LCDIC2::rightToLeft() {
 bool LCDIC2::setBacklight(bool state) {
   Wire.beginTransmission(_address);
   Wire.write((_backlight = state) << 3);
-  return !Wire.endTransmission(0);
+  return !Wire.endTransmission(1);
 }
 
 bool LCDIC2::setBlink(bool state) {
