@@ -1,7 +1,7 @@
 #ifndef LCDIC2_H
 #define LCDIC2_H
 
-#include "Wire.h"
+#include <Wire.h>
 
 #define LCDIC2_MODE         0b100
 #define LCDIC2_DISPLAY      0b1000
@@ -30,9 +30,8 @@ class LCDIC2 {
     uint8_t flag();
     uint8_t length(uint8_t y);
     uint8_t request(uint8_t rs);
-    bool send(uint8_t data, uint16_t us = 0);
     uint8_t start(uint8_t y);
-    void wait(uint16_t us);
+    bool wait(uint16_t us);
     bool write(uint8_t data, uint8_t rs = 0);
     bool writeHigh(uint8_t data, uint8_t rs = 0);
     bool writeLow(uint8_t data, uint8_t rs = 0);
