@@ -121,11 +121,11 @@ uint8_t LCDIC2::print(String data) {
 uint8_t LCDIC2::request(uint8_t rs) {
   writeHigh(0b11111111, rs);
   Wire.requestFrom(uint8_t(_address), uint8_t(1), uint8_t(0));
-  while (Wire.available() < 1);
+  //while (Wire.available() < 1);
   uint8_t data = Wire.read() & 0b11110000;
   writeLow(0b11111111, rs);
   Wire.requestFrom(uint8_t(_address), uint8_t(1), uint8_t(0));
-  while (Wire.available() < 1);
+  //while (Wire.available() < 1);
   return data | Wire.read() >> 4;
 }
 
