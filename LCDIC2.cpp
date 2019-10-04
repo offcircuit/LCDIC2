@@ -19,7 +19,7 @@ bool LCDIC2::begin() {
 }
 
 bool LCDIC2::busy() {
-  while (request(0b10) > 0b10000000);
+  while (request(0b10) >= 0b10000000);
   return true;
 }
 
