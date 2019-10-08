@@ -25,11 +25,10 @@ class LCDIC2 {
 
     bool busy();
     uint8_t request(uint8_t rs);
+    bool send(uint8_t data, uint8_t rs = 0);
     uint8_t start(uint8_t y);
     bool wait(uint16_t us);
     bool write(uint8_t data, uint8_t rs = 0);
-    bool writeHigh(uint8_t data, uint8_t rs = 0);
-    bool writeLow(uint8_t data, uint8_t rs = 0);
 
   public:
     const bool backlight = _backlight, blink = _blink, cursor = _cursor, display = _display, font = _font, gain = _gain, shift = _shift;

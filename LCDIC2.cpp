@@ -7,10 +7,10 @@ bool LCDIC2::begin() {
   Wire.begin();
 
   return (_height && _width)
-         && writeLow(0b11) && wait(4100)
-         && writeLow(0b11) && wait(100)
-         && writeLow(0b11) && wait(100)
-         && writeLow(0b10) && wait(100)
+         && send(0b110000) && wait(4100)
+         && send(0b110000) && wait(100)
+         && send(0b110000) && wait(100)
+         && send(0b100000) && wait(100)
          && write(LCDIC2_FUNCTION | LCDIC2_BITS_4 | (_height > 1) << 3 | (_font & (_height == 1)) << 2)
          && write(LCDIC2_DISPLAY | _display << 2 | _cursor << 1 | _blink)
          && write(0b1)
@@ -94,16 +94,23 @@ uint8_t LCDIC2::print(String data) {
 }
 
 uint8_t LCDIC2::request(uint8_t rs) {
-  writeHigh(0b11111111, rs);
+  send(0b11110000, rs);
   Wire.requestFrom(uint8_t(_address), uint8_t(1));
   uint8_t data = Wire.read() & 0b11110000;
-  writeLow(0b11111111, rs);
+  send(0b11110000, rs);
   Wire.requestFrom(uint8_t(_address), uint8_t(1));
   return data | Wire.read() >> 4;
 }
 
 bool LCDIC2::rightToLeft() {
   return write(LCDIC2_MODE | (_gain = 0) << 1 | _shift);
+}
+
+bool LCDIC2::send(uint8_t data, uint8_t rs) {
+  Wire.beginTransmission(_address);
+  Wire.write(data | _backlight << 3 | rs);
+  Wire.write(data | _backlight << 3 | rs | 0b100);
+  return !Wire.endTransmission(1);
 }
 
 bool LCDIC2::setBacklight(bool state) {
@@ -158,19 +165,5 @@ bool LCDIC2::wait(uint16_t us) {
 }
 
 bool LCDIC2::write(uint8_t data, uint8_t rs) {
-  return writeHigh(data, rs) && writeLow(data, rs) && busy();
-}
-
-bool LCDIC2::writeHigh(uint8_t data, uint8_t rs) {
-  Wire.beginTransmission(_address);
-  Wire.write((data & 0b11110000) | (_backlight << 3) | rs);
-  Wire.write((data & 0b11110000) | (_backlight << 3) | rs | 0b100);
-  return !Wire.endTransmission(1);
-}
-
-bool LCDIC2::writeLow(uint8_t data, uint8_t rs) {
-  Wire.beginTransmission(_address);
-  Wire.write((data << 4) | (_backlight << 3) | rs);
-  Wire.write((data << 4) | (_backlight << 3) | rs | 0b100);
-  return !Wire.endTransmission(1);
+  return send(data & 0b11110000, rs) && send(data << 4, rs) && busy();
 }
