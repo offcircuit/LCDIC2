@@ -158,7 +158,7 @@ bool LCDIC2::wait(uint16_t us) {
 }
 
 bool LCDIC2::write(uint8_t data, uint8_t rs) {
-  return writeHigh(data, rs) && busy() && writeLow(data, rs) && busy();
+  return writeHigh(data, rs) && writeLow(data, rs) && busy();
 }
 
 bool LCDIC2::writeHigh(uint8_t data, uint8_t rs) {
